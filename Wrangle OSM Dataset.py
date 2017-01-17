@@ -9,7 +9,9 @@ Created on Tue Jan 17 16:19:36 2017
 # -*- coding: utf-8 -*-
 
 import xml.etree.cElementTree as ET  # Use cElementTree or lxml if too slow
-
+from collections import defaultdict
+import re
+import pprint
 
 class OSMFile(object):
     '''
@@ -101,3 +103,45 @@ if __name__ == '__main__':
     # Initialize and create OSM original file and sample file
     osm = OSMFile(osm_file, sample_file, sample_size)
     osm.createSampleFile()
+    
+    
+
+
+    OSMFILE = "example.osm"
+    street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
+    
+    
+    expected = ["Street", "Avenue", "Boulevard", "Drive", "Court", "Place", "Square", "Lane", "Road", 
+                "Trail", "Parkway", "Commons"]
+    
+    # UPDATE THIS VARIABLE
+    mapping = { "St": "Street",
+                "St.": "Street"
+                }
+    
+    
+    def audit_street_type(street_types, street_name):
+        m = street_type_re.search(street_name)
+        if m:
+            street_type = m.group()
+            if street_type not in expected:
+                street_types[street_type].add(street_name)
+    
+    
+    def is_street_name(elem):
+        return (elem.attrib['k'] == "addr:street")
+    
+    
+    def audit(sample_file):
+        f = open(sample_file, "r")
+        street_types = defaultdict(set)
+        for event, elem in ET.iterparse(f, events=("start",)):
+    
+            if elem.tag == "node" or elem.tag == "way":
+                for tag in elem.iter("tag"):
+                    if is_street_name(tag):
+                        audit_street_type(street_types, tag.attrib['v'])
+        f.close()
+        return street_types
+        
+    print(audit(sample_file))
