@@ -11,12 +11,6 @@ Created on Tue Jan 17 16:19:36 2017
 import xml.etree.cElementTree as ET  # Use cElementTree or lxml if too slow
 
 
-OSM_FILE = "brooklyn_new-york.osm"  # Replace this with your osm file
-SAMPLE_FILE = "sample.osm"
-
-k = 1000 # Parameter: take every k-th top level element
-
-
 class OSMFile(object):
     '''
     OSM File handler
@@ -88,6 +82,7 @@ class OSMFile(object):
             output.write('<osm>\n  ')
             
             k = self.getSampleSize() 
+            
             # Write every kth top level element
             for i, element in enumerate(self.getElement()):
                 if i % k == 0:
