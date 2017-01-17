@@ -11,7 +11,7 @@ Created on Tue Jan 17 16:19:36 2017
 import xml.etree.cElementTree as ET  # Use cElementTree or lxml if too slow
 from collections import defaultdict
 import re
-import pprint
+
 
 class OSMFile(object):
     '''
@@ -91,6 +91,126 @@ class OSMFile(object):
                     output.write(ET.tostring(element, encoding='utf-8'))
 
             output.write('</osm>')
+
+class CleanStreets(object):
+    '''
+    Clean Streets of OSM File
+    From Udacity
+    '''
+    def __init__(self, sample_file):
+        '''
+        Initialize a Clean Streets instance, saves all parameters as attributes 
+        of the instance. Finds and returns all instances of unexpected 
+        street suffixes.
+
+        sample_file: Sampled OSM output file, created in given sample_file 
+                     path (a string)        
+        
+        street_type_re: Regex created to find the street suffix for 
+                        tag attributes. (a regex)
+                        
+        expected: Expected street names, street names which are deemed as 
+                  acceptable format. (a list of strings)
+                  
+        mapping: Keys that are found as street suffix for tag attributes are 
+                 to be replaced by key's value. (a string dictonary of strings)
+        '''
+        self.sample_file = sample_file
+        self.street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
+        self.expected = ['Street',
+                         'Avenue',
+                         'Boulevard',
+                         'Drive',
+                         'Court',
+                         'Place',
+                         'Square',
+                         'Lane',
+                         'Road',
+                         'Trail',
+                         'Parkway',
+                         'Commons']
+
+        # UPDATE THIS VARIABLE
+        self.mapping = { 'St': 'Street',
+                         'St.': 'Street'}
+
+    def getSampleFile(self):
+        '''
+        @return sample file name and/or directory. (a string)
+        '''
+        return self.sample_file
+        
+    def getStreetTypeRegex(self):
+        '''
+        @return street name type regex. (a string regex)
+        '''
+        return self.street_type_re
+    
+    def getExpected(self):
+        '''
+        @return street suffixes. (a list of strings)
+        '''
+        return self.expected
+        
+    def audit_street_type(self, street_types, street_name):
+        '''
+        Audits street type by checking if the street type is in the list 
+        of expected street type values.
+        
+        Searches street_type aganist regex to find street suffix. If the street 
+        type is not in defaultdict set, it is added to street_types defaultdict.
+        
+        The string of street_name is the value set to the street_type key 
+        in street_types defaultdict.
+
+        street_types: Street type is a dictionary set, which is mutated within 
+                      the function, passed from aduit function. 
+                      (a string defaultdict set of strings)
+                      
+        street_name: Street name string value found in tag attribute. (a string)
+        '''
+        m = self.getStreetTypeRegex().search(street_name)
+            
+        if m:
+            street_type = m.group()
+            if street_type not in self.getExpected():
+                street_types[street_type].add(street_name)
+
+    def is_street_name(self, elem):
+        '''
+        Evaluates if tag attribute is equal to a address of type street.
+
+        elem: XML tag element object (a object)
+
+        @return: Bool if the tag attribute is equal to a address of type street.
+        '''
+        return (elem.attrib['k'] == 'addr:street')
+
+
+    def audit(self):
+        '''
+        Iterates over XML tag elements in order to find all of the addresses 
+        of type street.
+        
+        Evaluates the tag 'v' attributes to determine if the street suffixes 
+        are within the expected street suffix list.
+
+        @return: DefaultDict of unexpected street suffixes as keys, 
+        the full street names as values. (a string defaultdict set of strings)
+        '''
+        with open(self.getSampleFile(), 'r') as finput:
+            street_types = defaultdict(set)
+            
+            for event, elem in ET.iterparse(finput, events=('start',)):
+    
+                if elem.tag == 'node' or elem.tag == 'way':
+                    for tag in elem.iter('tag'):
+                        if self.is_street_name(tag):
+                            self.audit_street_type(street_types, tag.attrib['v'])
+        return street_types
+
+
+
             
 if __name__ == '__main__':
         
@@ -104,44 +224,7 @@ if __name__ == '__main__':
     osm = OSMFile(osm_file, sample_file, sample_size)
     osm.createSampleFile()
     
-    
+    # Initialize and clean street type tag attributes
+    cleanSt = CleanStreets(sample_file)
+    print(cleanSt.audit())
 
-
-    OSMFILE = "example.osm"
-    street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
-    
-    
-    expected = ["Street", "Avenue", "Boulevard", "Drive", "Court", "Place", "Square", "Lane", "Road", 
-                "Trail", "Parkway", "Commons"]
-    
-    # UPDATE THIS VARIABLE
-    mapping = { "St": "Street",
-                "St.": "Street"
-                }
-    
-    
-    def audit_street_type(street_types, street_name):
-        m = street_type_re.search(street_name)
-        if m:
-            street_type = m.group()
-            if street_type not in expected:
-                street_types[street_type].add(street_name)
-    
-    
-    def is_street_name(elem):
-        return (elem.attrib['k'] == "addr:street")
-    
-    
-    def audit(sample_file):
-        f = open(sample_file, "r")
-        street_types = defaultdict(set)
-        for event, elem in ET.iterparse(f, events=("start",)):
-    
-            if elem.tag == "node" or elem.tag == "way":
-                for tag in elem.iter("tag"):
-                    if is_street_name(tag):
-                        audit_street_type(street_types, tag.attrib['v'])
-        f.close()
-        return street_types
-        
-    print(audit(sample_file))
