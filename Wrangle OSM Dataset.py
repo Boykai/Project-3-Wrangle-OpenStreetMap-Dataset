@@ -11,6 +11,7 @@ Created on Tue Jan 17 16:19:36 2017
 import xml.etree.cElementTree as ET  # Use cElementTree or lxml if too slow
 from collections import defaultdict
 import re
+import pprint
 
 
 class OSMFile(object):
@@ -152,7 +153,7 @@ class CleanStreets(object):
         '''
         return self.expected
         
-    def audit_street_type(self, street_types, street_name):
+    def auditStreetType(self, street_types, street_name):
         '''
         Audits street type by checking if the street type is in the list 
         of expected street type values.
@@ -176,7 +177,7 @@ class CleanStreets(object):
             if street_type not in self.getExpected():
                 street_types[street_type].add(street_name)
 
-    def is_street_name(self, elem):
+    def isStreetName(self, elem):
         '''
         Evaluates if tag attribute is equal to a address of type street.
 
@@ -205,8 +206,8 @@ class CleanStreets(object):
     
                 if elem.tag == 'node' or elem.tag == 'way':
                     for tag in elem.iter('tag'):
-                        if self.is_street_name(tag):
-                            self.audit_street_type(street_types, tag.attrib['v'])
+                        if self.isStreetName(tag):
+                            self.auditStreetType(street_types, tag.attrib['v'])
         return street_types
 
 
@@ -226,5 +227,5 @@ if __name__ == '__main__':
     
     # Initialize and clean street type tag attributes
     cleanSt = CleanStreets(sample_file)
-    print(cleanSt.audit())
-
+    unexpected_streets = cleanSt.audit()
+    pprint.pprint(unexpected_streets)
