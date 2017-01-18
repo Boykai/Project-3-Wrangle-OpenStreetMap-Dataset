@@ -233,7 +233,16 @@ class CleanStreets(object):
 
         return sorted_streets
 
-
+    def clean(self):
+        '''
+        Get unexpected street suffixes and replace with acceptable street
+        suffixes when determined that the data is unacceptably dirty.
+        
+        @return: Clean sorted defaultdict of street names with correct suffixes
+                 (a defaultdict of strings)
+        '''
+        
+        return clean_streets
 
             
 if __name__ == '__main__':
