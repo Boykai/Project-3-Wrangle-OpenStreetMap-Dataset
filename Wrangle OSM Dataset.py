@@ -118,18 +118,18 @@ class CleanStreets(object):
         '''
         self.sample_file = sample_file
         self.street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
-        self.expected = ['Street',
-                         'Avenue',
+        self.expected = ['Avenue',
                          'Boulevard',
-                         'Drive',
+                         'Commons',
                          'Court',
-                         'Place',
-                         'Square',
+                         'Drive',
                          'Lane',
-                         'Road',
-                         'Trail',
                          'Parkway',
-                         'Commons']
+                         'Place',
+                         'Road',
+                         'Square',
+                         'Street',
+                         'Trail']
 
         # UPDATE THIS VARIABLE
         self.mapping = { 'St': 'Street',
@@ -253,4 +253,6 @@ if __name__ == '__main__':
     unexpected_streets = cleanSt.audit()
     
     pprint.pprint(unexpected_streets)
+    
+    
 
