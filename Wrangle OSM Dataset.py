@@ -196,8 +196,8 @@ class CleanStreets(object):
         Evaluates the tag 'v' attributes to determine if the street suffixes 
         are within the expected street suffix list.
 
-        @return: DefaultDict of unexpected street suffixes as keys, 
-        the full street names as values. (a string defaultdict set of strings)
+        @return: Defaultdict of unexpected street suffixes as keys, 
+                 the full street names as values. (a defaultdict of strings)
         '''
         with open(self.getSampleFile(), 'r') as finput:
             street_types = defaultdict(set)
@@ -208,7 +208,30 @@ class CleanStreets(object):
                     for tag in elem.iter('tag'):
                         if self.isStreetName(tag):
                             self.auditStreetType(street_types, tag.attrib['v'])
+
+        street_types = self.sortStreets(street_types)
+
         return street_types
+
+    def sortStreets(self, unsorted_streets):
+        '''
+        Sorts street types defaultdict by key, with proper values.
+        
+        unsorted_streets: Unsorted defaultdict of street types with values
+                          equal to the instances of street type 
+                          (a defaultdict of strings)
+                          
+        @return: Sorted defaultdict of unexpected street suffixes as keys,
+                 the full street names as values. (a defaultdict of strings)
+        '''
+        sorted_streets = {}
+
+        sorted_keys = sorted(unsorted_streets.keys())
+        
+        for key in sorted_keys:
+            sorted_streets[key] = unsorted_streets[key]
+
+        return sorted_streets
 
 
 
@@ -228,4 +251,6 @@ if __name__ == '__main__':
     # Initialize and clean street type tag attributes
     cleanSt = CleanStreets(sample_file)
     unexpected_streets = cleanSt.audit()
+    
     pprint.pprint(unexpected_streets)
+
