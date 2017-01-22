@@ -131,10 +131,19 @@ class CleanStreets(object):
                          'Street',
                          'Trail']
 
+        self.dirty_to_clean_streets = {'avenue' : 'Avenue'}
+        
+        '''
         # UPDATE THIS VARIABLE
-        self.mapping = { 'St': 'Street',
-                         'St.': 'Street'}
-
+        self.mapping = {'1' : '', #'Graham Avenue #1'
+                        '107' : '', #'Nostrand Avenue,  #107'
+                        '11217' : '', #'305 Schermerhorn St., Brooklyn, NY 11217'
+                        '200' : '', #'305 Schermerhorn St., Brooklyn, NY 11217'
+                        'avenue' : 'Avenue',
+                        'St': 'Street',
+                        'St.': 'Street'}
+        '''
+        
     def getSampleFile(self):
         '''
         @return sample file name and/or directory. (a string)
@@ -152,6 +161,12 @@ class CleanStreets(object):
         @return street suffixes. (a list of strings)
         '''
         return self.expected
+        
+    def getDirtyToCleanStreets(self):
+        '''
+        @return dirty to clean streets mapping dict. (a dictionary of strings)
+        '''
+        return self.dirty_to_clean_streets
         
     def auditStreetType(self, street_types, street_name):
         '''
@@ -233,17 +248,45 @@ class CleanStreets(object):
 
         return sorted_streets
 
-    def clean(self):
+    def clean(self, unexpected_dirty_streets):
         '''
         Get unexpected street suffixes and replace with acceptable street
         suffixes when determined that the data is unacceptably dirty.
         
+        Assumes that every key given by self.aduit() is of type string.
+        
+        Assumes that every assigned to a key value given by self.adult() is of
+        type string.
+        
+        Assumes that every key given by self.aduit() has valid string value.
+        
+        
         @return: Clean sorted defaultdict of street names with correct suffixes
                  (a defaultdict of strings)
         '''
+        clean_streets_dict = {}
+        unexpected_streets = unexpected_dirty_streets.copy()
         
-        return clean_streets
+        
+        #Iterate over unexpected street types found
+        for key in unexpected_streets.keys():
+            
+            # Determine if unexpected street type is not acceptable
+            if key in self.dirty_to_clean_streets.keys():
+                list_of_streets = list(unexpected_streets[key])
+                
+                # Iterate over streets of unacceptable street type    
+                for i, street in enumerate(list_of_streets):
+                    street_name = street[ : -len(key)]
+                    good_street = (street_name +  self.dirty_to_clean_streets[key])
+                    bad_street = str(list(unexpected_streets[key])[0])
+                    
+                    # Save each unacceptabled street as [key] to 
+                    # acceptable street as [value] in clean_streets_dict
+                    clean_streets_dict[bad_street] = good_street
 
+        return clean_streets_dict
+        
             
 if __name__ == '__main__':
         
@@ -262,6 +305,7 @@ if __name__ == '__main__':
     unexpected_streets = cleanSt.audit()
     
     pprint.pprint(unexpected_streets)
+    pprint.pprint(cleanSt.clean(unexpected_streets))
     
     
 
