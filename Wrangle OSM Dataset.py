@@ -80,18 +80,18 @@ class OSMFile(object):
         while cleaning. By created a sample file, the time it takes to 
         analysis, audit, clean, and write the clean data is greatly reduced.
         '''
-        with open(self.getSampleFile(), 'wb') as output:
-            output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-            output.write('<osm>\n  ')
+        with open(self.getSampleFile(), 'wb') as f:
+            f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            f.write('<osm>\n  ')
             
             k = self.getSampleSize() 
             
             # Write every kth top level element
             for i, element in enumerate(self.getElement()):
                 if i % k == 0:
-                    output.write(ET.tostring(element, encoding='utf-8'))
+                    f.write(ET.tostring(element, encoding='utf-8'))
 
-            output.write('</osm>')
+            f.write('</osm>')
 
 class CleanStreets(object):
     '''
@@ -214,11 +214,11 @@ class CleanStreets(object):
         @return: Defaultdict of unexpected street suffixes as keys, 
                  the full street names as values. (a defaultdict of strings)
         '''
-        with open(self.getSampleFile(), 'r') as finput:
+        with open(self.getSampleFile(), 'r') as f:
             street_types = defaultdict(set)
-            
-            for event, elem in ET.iterparse(finput, events=('start',)):
-    
+            print('yo')
+            print(str(street_types))
+            for event, elem in ET.iterparse(f, events=('start',)):
                 if elem.tag == 'node' or elem.tag == 'way':
                     for tag in elem.iter('tag'):
                         if self.isStreetName(tag):
@@ -286,8 +286,9 @@ class CleanStreets(object):
                     clean_streets_dict[bad_street] = good_street
 
         return clean_streets_dict
+
         
-            
+
 if __name__ == '__main__':
         
     # Get OSM File, which is Brooklyn OpenStreetMap
@@ -302,10 +303,17 @@ if __name__ == '__main__':
     
     # Initialize and clean street type tag attributes
     cleanSt = CleanStreets(sample_file)
+    
+    # Audit street tag attributes and store vales in unexpected_street dict
     unexpected_streets = cleanSt.audit()
-    
     pprint.pprint(unexpected_streets)
-    pprint.pprint(cleanSt.clean(unexpected_streets))
     
+    # Clean street values and store cleaned streets in clean_street_dict
+    clean_streets_dict = cleanSt.clean(unexpected_streets)
+    pprint.pprint(clean_streets_dict)
+    
+    #cleanSt.writeClean(clean_streets_dict)
+    
+    #pprint.pprint(cleanSt.audit())
     
 
