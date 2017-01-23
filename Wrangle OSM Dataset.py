@@ -287,8 +287,28 @@ class CleanStreets(object):
 
         return clean_streets_dict
 
+    def writeClean(self, cleaned_streets):
+        '''
+        Get cleaned streets mapping dictionary and use that dictionary to find
+        and replace all bad street name tag attributes within XML file.
+    
+        Iterate through XML file to find all bad instances of tag attribute 
+        street names, and replace with correct mapping value from cleaned_streets
+        mapping dictionary.
+    
+        '''
+        tree = ET.parse(self.getSampleFile())
+        # with open(self.getSampleFile(), 'r+') as f:            
+        for event, elem in ET.iterparse(self.getSampleFile(), events=('start',)):
+            if elem.tag == 'node' or elem.tag == 'way':
+                for tag in elem.iter('tag'):
+                    if self.isStreetName(tag):
+                        street = tag.attrib['v']
+                        if street in cleaned_streets.keys():
+                            tag.attrib['v'] = cleaned_streets[street]   
+        tree.write(self.getSampleFile())
         
-
+        
 if __name__ == '__main__':
         
     # Get OSM File, which is Brooklyn OpenStreetMap
@@ -299,7 +319,7 @@ if __name__ == '__main__':
 
     # Initialize and create OSM original file and sample file
     osm = OSMFile(osm_file, sample_file, sample_size)
-    osm.createSampleFile()
+    #osm.createSampleFile()
     
     # Initialize and clean street type tag attributes
     cleanSt = CleanStreets(sample_file)
@@ -312,8 +332,8 @@ if __name__ == '__main__':
     clean_streets_dict = cleanSt.clean(unexpected_streets)
     pprint.pprint(clean_streets_dict)
     
-    #cleanSt.writeClean(clean_streets_dict)
+    cleanSt.writeClean(clean_streets_dict)
     
-    #pprint.pprint(cleanSt.audit())
+    pprint.pprint(cleanSt.audit())
     
 
