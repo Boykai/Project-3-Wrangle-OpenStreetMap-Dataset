@@ -216,8 +216,8 @@ class CleanStreets(object):
         '''
         with open(self.getSampleFile(), 'r') as f:
             street_types = defaultdict(set)
-            print('yo')
-            print(str(street_types))
+            #print('yo')
+            #print(str(street_types))
             for event, elem in ET.iterparse(f, events=('start',)):
                 if elem.tag == 'node' or elem.tag == 'way':
                     for tag in elem.iter('tag'):
@@ -297,15 +297,23 @@ class CleanStreets(object):
         mapping dictionary.
     
         '''
+        # Open XML sample file to parse
         tree = ET.parse(self.getSampleFile())
-        # with open(self.getSampleFile(), 'r+') as f:            
+
+        # Iterate over XML element tags for 'node' and 'way' tags
         for event, elem in ET.iterparse(self.getSampleFile(), events=('start',)):
             if elem.tag == 'node' or elem.tag == 'way':
                 for tag in elem.iter('tag'):
+                    
+                    # Check if tag is a street name tag,. set street name to street
                     if self.isStreetName(tag):
                         street = tag.attrib['v']
-                        if street in cleaned_streets.keys():
-                            tag.attrib['v'] = cleaned_streets[street]   
+                       
+                        # If street name is in clean streets dict, replace
+                        # dirty street with clean street value
+                        if street in cleaned_streets.keys(): 
+                            tag.set('v', cleaned_streets[street])
+                            
         tree.write(self.getSampleFile())
         
         
@@ -319,21 +327,26 @@ if __name__ == '__main__':
 
     # Initialize and create OSM original file and sample file
     osm = OSMFile(osm_file, sample_file, sample_size)
-    #osm.createSampleFile()
+    osm.createSampleFile()
     
     # Initialize and clean street type tag attributes
     cleanSt = CleanStreets(sample_file)
     
     # Audit street tag attributes and store vales in unexpected_street dict
+    # returns street type keys with street name values dict
     unexpected_streets = cleanSt.audit()
+    print('Dictionary of unexpected street name types with street names: ')
     pprint.pprint(unexpected_streets)
-    
+
     # Clean street values and store cleaned streets in clean_street_dict
     clean_streets_dict = cleanSt.clean(unexpected_streets)
+    print('\nDictionary of dirty street keys and clean street values: ')
     pprint.pprint(clean_streets_dict)
     
+    # Find and write clean street names to XML file, save updated XML file
     cleanSt.writeClean(clean_streets_dict)
-    
+    print('\nNew audit after street names have been replaced with clean street'
+          + 'names: ')
     pprint.pprint(cleanSt.audit())
     
 
