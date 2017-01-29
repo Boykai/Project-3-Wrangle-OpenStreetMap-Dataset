@@ -298,9 +298,9 @@ class CleanStreets(object):
     
         '''
         # Open XML sample file to parse
-        tree = ET.parse(self.getSampleFile())
+        #tree = ET.parse(self.getSampleFile())
 
-        # Iterate over XML element tags for 'node' and 'way' tags
+        # Iterate over XML element tags for 'node' and 'way' tags    
         for event, elem in ET.iterparse(self.getSampleFile(), events=('start',)):
             if elem.tag == 'node' or elem.tag == 'way':
                 for tag in elem.iter('tag'):
@@ -313,8 +313,7 @@ class CleanStreets(object):
                         # dirty street with clean street value
                         if street in cleaned_streets.keys(): 
                             tag.set('v', cleaned_streets[street])
-                            
-        tree.write(self.getSampleFile())
+        #tree.write(self.getSampleFile())
         
         
 if __name__ == '__main__':
