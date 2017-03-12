@@ -80,6 +80,8 @@ class OSMFile(object):
         while cleaning. By created a sample file, the time it takes to 
         analysis, audit, clean, and write the clean data is greatly reduced.
         '''
+        print('Creating sample JSON file...')
+        
         with open(self.getSampleFile(), 'wb') as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             f.write('<osm>\n  ')
@@ -118,18 +120,31 @@ class CleanStreets(object):
         '''
         self.sample_file = sample_file
         self.street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
-        self.expected = ['Avenue',
+        self.expected = ['Alley',
+                         'Avenue',
                          'Boulevard',
+                         'Broadway',
                          'Commons',
                          'Court',
                          'Drive',
+                         'East',
+                         'Heights',
+                         'Highway',
                          'Lane',
+                         'Loop',
+                         'North',
+                         'Park',
                          'Parkway',
                          'Place',
+                         'Plaza',
                          'Road',
+                         'South',
                          'Square',
                          'Street',
-                         'Trail']
+                         'Terrace',
+                         'Trail',
+                         'Walk',
+                         'West']
 
         self.dirty_to_clean_streets = {'avenue' : 'Avenue'}
         
@@ -139,9 +154,22 @@ class CleanStreets(object):
                         '107' : '', #'Nostrand Avenue,  #107'
                         '11217' : '', #'305 Schermerhorn St., Brooklyn, NY 11217'
                         '200' : '', #'305 Schermerhorn St., Brooklyn, NY 11217'
+                        'Ave' : 'Avenue',
+                        'Ave.' : 'Avenue',
+                        'Avene' : 'Avenue',
+                        'Avenue,' : 'Avenue',
                         'avenue' : 'Avenue',
+                        'ave' : 'Avenue',
+                        'Blvd' : 'Boulevard',
+                        'Crt' : 'Court',
+                        'Dr' : 'Drive',
+                        'Rd' : ' Road'
+                        'ST' : 'Street',
                         'St': 'Street',
-                        'St.': 'Street'}
+                        'St.': 'Street',
+                        'st' : 'Street',
+                        'street' : 'Street',
+                        'Streeet' : 'Street'}
         '''
         
     def getSampleFile(self):
@@ -322,7 +350,7 @@ if __name__ == '__main__':
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
     osm_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     sample_file = 'sample.osm'  # Sample OSM File output name
-    sample_size = 100   
+    sample_size = 1 
 
     # Initialize and create OSM original file and sample file
     osm = OSMFile(osm_file, sample_file, sample_size)
