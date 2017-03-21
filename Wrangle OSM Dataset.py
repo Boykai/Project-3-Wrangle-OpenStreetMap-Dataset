@@ -37,24 +37,28 @@ class OSMFile(object):
         self.sample_file = sample_file
         self.sample_size = sample_size
         
+        
     def getSampleFile(self):
         '''
         @return sample file name and/or directory. (a string)
         '''
         return self.sample_file
     
+        
     def getOsmFile(self):
         '''
         @return OSM file name and/or directory. (a string)
         '''
         return self.osm_file
     
+        
     def getSampleSize(self):
         '''
         @return sample size. (a non-zero, positive integer)
         '''
         return self.sample_size
     
+        
     def getElement(self, tags=('node', 'way', 'relation')):
         '''
         XML tag element generator
@@ -74,6 +78,7 @@ class OSMFile(object):
                 yield elem
                 root.clear()
 
+                
     def createSampleFile(self):
         '''
         Creates and writes to sample file, a new OSM file to work with 
@@ -95,6 +100,7 @@ class OSMFile(object):
 
             f.write('</osm>')
 
+            
 class CleanStreets(object):
     '''
     Clean Streets of OSM File
@@ -172,11 +178,13 @@ class CleanStreets(object):
                         'Streeet' : 'Street'}
         '''
         
+        
     def getSampleFile(self):
         '''
         @return sample file name and/or directory. (a string)
         '''
         return self.sample_file
+        
         
     def getStreetTypeRegex(self):
         '''
@@ -184,17 +192,20 @@ class CleanStreets(object):
         '''
         return self.street_type_re
     
+        
     def getExpected(self):
         '''
         @return street suffixes. (a list of strings)
         '''
         return self.expected
         
+        
     def getDirtyToCleanStreets(self):
         '''
         @return dirty to clean streets mapping dict. (a dictionary of strings)
         '''
         return self.dirty_to_clean_streets
+        
         
     def auditStreetType(self, street_types, street_name):
         '''
@@ -220,6 +231,7 @@ class CleanStreets(object):
             if street_type not in self.getExpected():
                 street_types[street_type].add(street_name)
 
+                
     def isStreetName(self, elem):
         '''
         Evaluates if tag attribute is equal to a address of type street.
@@ -231,7 +243,7 @@ class CleanStreets(object):
         return (elem.attrib['k'] == 'addr:street')
 
 
-    def audit(self):
+    def audit(self, audit_file):
         '''
         Iterates over XML tag elements in order to find all of the addresses 
         of type street.
@@ -242,8 +254,9 @@ class CleanStreets(object):
         @return: Defaultdict of unexpected street suffixes as keys, 
                  the full street names as values. (a defaultdict of strings)
         '''
-        with open(self.getSampleFile(), 'r') as f:
+        with open(audit_file, 'r') as f:
             street_types = defaultdict(set)
+            f.seek(0)
             #print('yo')
             #print(str(street_types))
             for event, elem in ET.iterparse(f, events=('start',)):
@@ -256,6 +269,7 @@ class CleanStreets(object):
 
         return street_types
 
+        
     def sortStreets(self, unsorted_streets):
         '''
         Sorts street types defaultdict by key, with proper values.
@@ -276,6 +290,7 @@ class CleanStreets(object):
 
         return sorted_streets
 
+        
     def clean(self, unexpected_dirty_streets):
         '''
         Get unexpected street suffixes and replace with acceptable street
@@ -315,6 +330,7 @@ class CleanStreets(object):
 
         return clean_streets_dict
 
+        
     def writeClean(self, cleaned_streets):
         '''
         Get cleaned streets mapping dictionary and use that dictionary to find
@@ -322,36 +338,47 @@ class CleanStreets(object):
     
         Iterate through XML file to find all bad instances of tag attribute 
         street names, and replace with correct mapping value from cleaned_streets
-        mapping dictionary.
+        mapping dictionary. 
+        
+        Stores new cleaned XML file in 'output.osm'
+        
+        celaned_streets: Clean sorted defaultdict of street names with correct suffixes
+                         (a defaultdict of strings)
     
         '''
-        # Open XML sample file to parse
-        #tree = ET.parse(self.getSampleFile())
-
-        # Iterate over XML element tags for 'node' and 'way' tags    
-        for event, elem in ET.iterparse(self.getSampleFile(), events=('start',)):
-            if elem.tag == 'node' or elem.tag == 'way':
-                for tag in elem.iter('tag'):
-                    
-                    # Check if tag is a street name tag,. set street name to street
-                    if self.isStreetName(tag):
-                        street = tag.attrib['v']
-                       
-                        # If street name is in clean streets dict, replace
-                        # dirty street with clean street value
-                        if street in cleaned_streets.keys(): 
-                            tag.set('v', cleaned_streets[street])
-                            #tag.attrib['v'].set(street, cleaned_streets[street])
-        #tree.write(self.getSampleFile())
-        
-        
+        with open('output.osm', 'w') as output:
+            output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            output.write('<osm>\n  ')
+            osm_file = open(self.getSampleFile(), "r")
+            
+            for event, elem in ET.iterparse(osm_file, events=('start', 'end')):
+                # 1. begin processing when the end of the element is reached
+                # 2. Include all elements, except 'osm', for processing (so that your files are identical)
+                if event == 'end' and (elem.tag in ["node", "way", "relation", "bounds","meta","note"] ):
+                    for tag in elem.iter("tag"):
+                        # Check if tag is a street name tag,. set street name to street
+                            if self.isStreetName(tag):
+                                street = tag.attrib['v']   
+                                # If street name is in clean streets dict, replace
+                                # dirty street with clean street value
+                                if street in cleaned_streets.keys(): 
+                                    tag.attrib['v'] = cleaned_streets[street]
+                    # 3. move the write function inside the condition, so that it only writes
+                    # tags that you specify (i.e. everything apart from the root <osm> element)
+                    output.write(ET.tostring(elem, encoding='utf-8'))
+            output.write('</osm>')
+            osm_file.close()
+   
+            
 if __name__ == '__main__':
         
     # Get OSM File, which is Brooklyn OpenStreetMap
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
     osm_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     sample_file = 'sample.osm'  # Sample OSM File output name
-    sample_size = 100 
+    output_file = 'output.osm'
+    sample_size = 10 
+
 
     # Initialize and create OSM original file and sample file
     osm = OSMFile(osm_file, sample_file, sample_size)
@@ -359,10 +386,10 @@ if __name__ == '__main__':
     
     # Initialize and clean street type tag attributes
     cleanSt = CleanStreets(sample_file)
-    
+
     # Audit street tag attributes and store vales in unexpected_street dict
     # returns street type keys with street name values dict
-    unexpected_streets = cleanSt.audit()
+    unexpected_streets = cleanSt.audit(sample_file)
     print('Dictionary of unexpected street name types with street names: ')
     pprint.pprint(unexpected_streets)
 
@@ -375,6 +402,6 @@ if __name__ == '__main__':
     cleanSt.writeClean(clean_streets_dict)
     print('\nNew audit after street names have been replaced with clean street'
           + 'names: ')
-    pprint.pprint(cleanSt.audit())
+    pprint.pprint(cleanSt.audit(output_file))
     
 
