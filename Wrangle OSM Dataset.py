@@ -384,22 +384,26 @@ if __name__ == '__main__':
     osm.createSampleFile()
     
     # Initialize and clean street type tag attributes
+    print('\nInitialzing and getting street type tag attributes...')
     cleanSt = CleanStreets(sample_file)
 
     # Audit street tag attributes and store vales in unexpected_street dict
     # returns street type keys with street name values dict
+    print('\nPerforming audit on street types...')
     unexpected_streets = cleanSt.audit(sample_file)
     print('Dictionary of unexpected street name types with street names: ')
     pprint.pprint(unexpected_streets)
 
     # Clean street values and store cleaned streets in clean_street_dict
+    print('\nCleaning street type values...')
     clean_streets_dict = cleanSt.clean(unexpected_streets)
-    print('\nDictionary of dirty street keys and clean street values: ')
+    print('Dictionary of dirty street keys and clean street values: ')
     pprint.pprint(clean_streets_dict)
     
     # Find and write clean street names to XML file, save updated XML file
+    print('\nCreating new output.osm file with cleaned street types...')
     cleanSt.writeClean(clean_streets_dict)
-    print('\nNew audit after street names have been replaced with clean street'
+    print('New audit after street names have been replaced with clean street'
           + 'names: ')
     pprint.pprint(cleanSt.audit(output_file))
     
