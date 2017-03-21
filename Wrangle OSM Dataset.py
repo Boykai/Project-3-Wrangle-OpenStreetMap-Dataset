@@ -80,7 +80,7 @@ class OSMFile(object):
         while cleaning. By created a sample file, the time it takes to 
         analysis, audit, clean, and write the clean data is greatly reduced.
         '''
-        print('Creating sample JSON file...')
+        print('Creating sample XML file...')
         
         with open(self.getSampleFile(), 'wb') as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -341,6 +341,7 @@ class CleanStreets(object):
                         # dirty street with clean street value
                         if street in cleaned_streets.keys(): 
                             tag.set('v', cleaned_streets[street])
+                            #tag.attrib['v'].set(street, cleaned_streets[street])
         #tree.write(self.getSampleFile())
         
         
@@ -350,7 +351,7 @@ if __name__ == '__main__':
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
     osm_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     sample_file = 'sample.osm'  # Sample OSM File output name
-    sample_size = 1 
+    sample_size = 100 
 
     # Initialize and create OSM original file and sample file
     osm = OSMFile(osm_file, sample_file, sample_size)
