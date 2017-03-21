@@ -130,6 +130,7 @@ class CleanStreets(object):
                          'Avenue',
                          'Boulevard',
                          'Broadway',
+                         'Ceneter',
                          'Commons',
                          'Court',
                          'Crescent',
@@ -145,6 +146,8 @@ class CleanStreets(object):
                          'Place',
                          'Plaza',
                          'Road',
+                         'Roadbed',
+                         'Slip',
                          'South',
                          'Square',
                          'Street',
@@ -153,10 +156,6 @@ class CleanStreets(object):
                          'Walk',
                          'West']
 
-        #self.dirty_to_clean_streets = {'avenue' : 'Avenue'}
-        
-        
-        # UPDATE THIS VARIABLE
         self.dirty_to_clean_streets = {'Ave' : 'Avenue',
                                        'Ave.' : 'Avenue',
                                        'Avene' : 'Avenue',
@@ -166,7 +165,7 @@ class CleanStreets(object):
                                        'Blvd' : 'Boulevard',
                                        'Crt' : 'Court',
                                        'Dr' : 'Drive',
-                                       'Rd' : ' Road',
+                                       'Rd' : 'Road',
                                        'ST' : 'Street',
                                        'St': 'Street',
                                        'St.': 'Street',
@@ -256,8 +255,7 @@ class CleanStreets(object):
         with open(audit_file, 'r') as f:
             street_types = defaultdict(set)
             f.seek(0)
-            #print('yo')
-            #print(str(street_types))
+
             for event, elem in ET.iterparse(f, events=('start',)):
                 if elem.tag == 'node' or elem.tag == 'way':
                     for tag in elem.iter('tag'):
