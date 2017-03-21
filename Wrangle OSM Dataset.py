@@ -127,10 +127,11 @@ class CleanStreets(object):
         self.sample_file = sample_file
         self.street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
         self.expected = ['Alley',
+                         'Americas',
                          'Avenue',
                          'Boulevard',
                          'Broadway',
-                         'Ceneter',
+                         'Center',
                          'Commons',
                          'Court',
                          'Crescent',
@@ -164,6 +165,7 @@ class CleanStreets(object):
                                        'ave' : 'Avenue',
                                        'Blvd' : 'Boulevard',
                                        'Crt' : 'Court',
+                                       'Ctr' : 'Court',
                                        'Dr' : 'Drive',
                                        'Rd' : 'Road',
                                        'ST' : 'Street',
