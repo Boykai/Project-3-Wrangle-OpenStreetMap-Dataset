@@ -132,6 +132,7 @@ class CleanStreets(object):
                          'Broadway',
                          'Commons',
                          'Court',
+                         'Crescent',
                          'Drive',
                          'East',
                          'Heights',
@@ -152,31 +153,29 @@ class CleanStreets(object):
                          'Walk',
                          'West']
 
-        self.dirty_to_clean_streets = {'avenue' : 'Avenue'}
+        #self.dirty_to_clean_streets = {'avenue' : 'Avenue'}
         
-        '''
+        
         # UPDATE THIS VARIABLE
-        self.mapping = {'1' : '', #'Graham Avenue #1'
-                        '107' : '', #'Nostrand Avenue,  #107'
-                        '11217' : '', #'305 Schermerhorn St., Brooklyn, NY 11217'
-                        '200' : '', #'305 Schermerhorn St., Brooklyn, NY 11217'
-                        'Ave' : 'Avenue',
-                        'Ave.' : 'Avenue',
-                        'Avene' : 'Avenue',
-                        'Avenue,' : 'Avenue',
-                        'avenue' : 'Avenue',
-                        'ave' : 'Avenue',
-                        'Blvd' : 'Boulevard',
-                        'Crt' : 'Court',
-                        'Dr' : 'Drive',
-                        'Rd' : ' Road'
-                        'ST' : 'Street',
-                        'St': 'Street',
-                        'St.': 'Street',
-                        'st' : 'Street',
-                        'street' : 'Street',
-                        'Streeet' : 'Street'}
-        '''
+        self.dirty_to_clean_streets = {'Ave' : 'Avenue',
+                                       'Ave.' : 'Avenue',
+                                       'Avene' : 'Avenue',
+                                       'Avenue,' : 'Avenue',
+                                       'avenue' : 'Avenue',
+                                       'ave' : 'Avenue',
+                                       'Blvd' : 'Boulevard',
+                                       'Crt' : 'Court',
+                                       'Dr' : 'Drive',
+                                       'Rd' : ' Road',
+                                       'ST' : 'Street',
+                                       'St': 'Street',
+                                       'St.': 'Street',
+                                       'st' : 'Street',
+                                       'St ' : 'Street',
+                                       'St. ' : 'Street',
+                                       'street' : 'Street',
+                                       'Streeet' : 'Street'}
+        
         
         
     def getSampleFile(self):
@@ -322,7 +321,7 @@ class CleanStreets(object):
                 for i, street in enumerate(list_of_streets):
                     street_name = street[ : -len(key)]
                     good_street = (street_name +  self.dirty_to_clean_streets[key])
-                    bad_street = str(list(unexpected_streets[key])[0])
+                    bad_street = str(list(unexpected_streets[key])[i])
                     
                     # Save each unacceptabled street as [key] to 
                     # acceptable street as [value] in clean_streets_dict
@@ -377,7 +376,7 @@ if __name__ == '__main__':
     osm_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     sample_file = 'sample.osm'  # Sample OSM File output name
     output_file = 'output.osm'
-    sample_size = 10 
+    sample_size = 1
 
 
     # Initialize and create OSM original file and sample file
