@@ -387,22 +387,18 @@ class JsonFile(object):
         node_refs = []
         pos = []
         if element.tag == "node" or element.tag == "way" :
-            # YOUR CODE HERE
             node['type'] = element.tag
     
-            # As 'element.attrib' is a dictionary, you can search it for keys directly:
             if 'lat' in element.attrib.keys() and 'lon' in element.attrib.keys():
                 try:
                     lat = float(element.attrib['lat'])
                     lon = float(element.attrib['lon'])
                     pos.insert(0,lat)
                     pos.insert(1,lon)
-                    # or pos = [lat,lon]
                 except:
                     pass
                 
             for k, m in element.attrib.items():
-                # you have taken care of 'lat' and 'lon' so skip those:
                 if k not in pos:
                     if k in self.created_tags:
                         created[k] = m
@@ -506,5 +502,5 @@ if __name__ == '__main__':
           + 'names: ')
     pprint.pprint(cleanSt.audit(output_file))
     
-    
+    # C
 
