@@ -379,6 +379,94 @@ class JsonFile(object):
         self.created_tags = [ 'version', 'changeset', 'timestamp', 'user', 'uid']
         self.output_file = output_file
 
+    
+    def shape_element(self, element):
+        node = {}
+        address = {}
+        created = {}
+        node_refs = []
+        pos = []
+        if element.tag == "node" or element.tag == "way" :
+            # YOUR CODE HERE
+            node['type'] = element.tag
+    
+            # As 'element.attrib' is a dictionary, you can search it for keys directly:
+            if 'lat' in element.attrib.keys() and 'lon' in element.attrib.keys():
+                try:
+                    lat = float(element.attrib['lat'])
+                    lon = float(element.attrib['lon'])
+                    pos.insert(0,lat)
+                    pos.insert(1,lon)
+                    # or pos = [lat,lon]
+                except:
+                    pass
+                
+            for k, m in element.attrib.items():
+                # you have taken care of 'lat' and 'lon' so skip those:
+                if k not in pos:
+                    if k in self.created_tags:
+                        created[k] = m
+                    else:
+                        node[k] = m
+            if created:
+              node['created'] = created
+            if pos:
+                node['pos'] = pos
+            if address:
+                print(address)
+                node['address'] = address
+            if node_refs:
+                node['node_refs'] = node_refs
+            if 'lon' in node.keys():
+                node.pop('lon')
+            if 'lat' in node.keys():
+                node.pop('lat')
+                
+            for child in element:
+                if child.tag == "nd":
+                    try:
+                        node["node_refs"].append(child.attrib['ref'])
+                    except:
+                        node["node_refs"] = []
+                        node["node_refs"].append(child.attrib['ref'])
+                elif child.tag == "tag":
+                    if child.attrib['k'].startswith("addr:"):
+                        key = re.sub('addr:', '', child.attrib['k']).strip()
+                        if self.lower_colon.match(key):
+                            break
+                        else:
+                            try:
+                                node['address'][key] = child.attrib['v']
+                            except:
+                                node['address'] = {}
+                                node['address'][key] = child.attrib['v']
+                    else:
+                        try:
+                            node['address'][child.attrib['k']] = child.attrib['v']
+                        except:
+                            node['address'] = {}
+                            node['address'][child.attrib['k']] = child.attrib['v']
+                        
+            return node
+        else:
+            return None
+
+            
+    def process_map(self, file_in, pretty = False):
+        # You do not need to change this file
+        file_in = self.output_file
+        file_out = "{0}.json".format(file_in)
+        data = []
+        with codecs.open(file_out, "w") as fo:
+            for _, element in ET.iterparse(file_in):
+                el = self.shape_element(element)
+                if el:
+                    data.append(el)
+                    if pretty:
+                        fo.write(json.dumps(el, indent=2)+"\n")
+                    else:
+                        fo.write(json.dumps(el) + "\n")
+        return data
             
 if __name__ == '__main__':
         
@@ -417,5 +505,6 @@ if __name__ == '__main__':
     print('New audit after street names have been replaced with clean street'
           + 'names: ')
     pprint.pprint(cleanSt.audit(output_file))
+    
     
 
