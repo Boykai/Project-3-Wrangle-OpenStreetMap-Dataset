@@ -12,6 +12,8 @@ import xml.etree.cElementTree as ET  # Use cElementTree or lxml if too slow
 from collections import defaultdict
 import re
 import pprint
+import codecs
+import json
 
 
 class OSMFile(object):
@@ -367,7 +369,16 @@ class CleanStreets(object):
                     output.write(ET.tostring(elem, encoding='utf-8'))
             output.write('</osm>')
             osm_file.close()
-   
+
+            
+class JsonFile(object):
+    def __init__(self, output_file):
+        self.lower = re.compile(r'^([a-z]|_)*$')
+        self.lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
+        self.problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
+        self.created_tags = [ 'version', 'changeset', 'timestamp', 'user', 'uid']
+        self.output_file = output_file
+
             
 if __name__ == '__main__':
         
