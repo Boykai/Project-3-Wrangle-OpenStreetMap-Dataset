@@ -448,7 +448,7 @@ class JsonFile(object):
             return None
 
             
-    def process_map(self, file_in, pretty = False):
+    def process_map(self, pretty = False):
         # You do not need to change this file
         file_in = self.output_file
         file_out = "{0}.json".format(file_in)
@@ -502,5 +502,7 @@ if __name__ == '__main__':
           + 'names: ')
     pprint.pprint(cleanSt.audit(output_file))
     
-    # C
+    # Initialize and create JSON file from cleaned XML output.osm file
+    js = JsonFile(output_file)
+    js.process_map()
 
