@@ -14,6 +14,7 @@ import re
 import pprint
 import codecs
 import json
+import os
 
 
 class OSMFile(object):
@@ -501,9 +502,12 @@ if __name__ == '__main__':
     print('New audit after street names have been replaced with clean street'
           + 'names: ')
     pprint.pprint(cleanSt.audit(xml_cleaned_file))
+    print('\nDeleting XML sample file...')
+    os.remove(xml_sample_file)
     
     # Initialize and create JSON file from cleaned XML output.osm file
     print('\nCreating new JSON file from cleaned XML file...')
     js = JsonFile(xml_cleaned_file)
     js.process_map()
-
+    print('\nDeleting XML cleaned file...')
+    os.remove(xml_cleaned_file)
