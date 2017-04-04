@@ -475,15 +475,26 @@ class JsonFile(object):
                         except:
                             node['address'] = {}
                             node['address'][child.attrib['k']] = child.attrib['v']
+                            
             return node
         else:
             return None
 
             
     def processMap(self, pretty = False):
+        '''
+        Takes an XML file, maps and creates a JSON file of the same information,
+        struction, and element nodes as the input XML file
+        
+        pretty: If pretty, creates a human readable JSON file (a bool)
+        
+        @return: List of JSON dictionary shaped node elements (a list)
+        '''
         file_in = self.output_file
         file_out = '{0}.json'.format(file_in[ : -4])
         data = []
+        
+        # Create JSON output file, shape and map each XML element
         with codecs.open(file_out, 'w') as fo:
             for _, element in ET.iterparse(file_in):
                 el = self.shapeElement(element)
@@ -493,8 +504,10 @@ class JsonFile(object):
                         fo.write(json.dumps(el, indent=2)+'\n')
                     else:
                         fo.write(json.dumps(el) + '\n')
+                        
         return data
             
+        
 if __name__ == '__main__':    
     # Get OSM File, which is Brooklyn OpenStreetMap
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
