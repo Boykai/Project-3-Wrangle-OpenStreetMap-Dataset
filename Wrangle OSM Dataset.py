@@ -15,6 +15,7 @@ import pprint
 import codecs
 import json
 import os
+from pymongo import MongoClient
 
 
 class OSMFile(object):
@@ -549,6 +550,15 @@ if __name__ == '__main__':
     # Initialize and create JSON file from cleaned XML output.osm file
     print('\nCreating new JSON file from cleaned XML file...')
     js = JsonFile(xml_cleaned_file)
-    js.processMap()
+    data = js.processMap()
     print('\nDeleting XML cleaned file...')
     os.remove(xml_cleaned_file)
+    
+    # Initialize and create MongoDB database from JSON document list 'data'
+    print('\nCreating new MongoDB database \'brooklyn\' from cleaned JSON file...')
+    client = MongoClient('mongodb://localhost:27017')
+    db = client.osm_results
+    db.brooklyn.insert(data)
+    print(str(db.brooklyn.find_one()))
+    
+                       
