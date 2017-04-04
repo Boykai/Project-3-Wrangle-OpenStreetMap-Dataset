@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 Created on Tue Jan 17 16:19:36 2017
 
 @author: Boykai
-"""
+'''
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -90,7 +90,7 @@ class OSMFile(object):
         print('Creating sample XML file...')
         
         with open(self.getSampleFile(), 'wb') as f:
-            f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            f.write("<?xml version='1.0' encoding='UTF-8'?>\n")
             f.write('<osm>\n  ')
             
             k = self.getSampleSize() 
@@ -348,15 +348,15 @@ class CleanStreets(object):
     
         '''
         with open('output.osm', 'w') as output:
-            output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            output.write("<?xml version='1.0' encoding='UTF-8'?>\n")
             output.write('<osm>\n  ')
-            osm_file = open(self.getSampleFile(), "r")
+            osm_file = open(self.getSampleFile(), 'r')
             
             for event, elem in ET.iterparse(osm_file, events=('start', 'end')):
                 # 1. begin processing when the end of the element is reached
                 # 2. Include all elements, except 'osm', for processing (so that your files are identical)
-                if event == 'end' and (elem.tag in ["node", "way", "relation", "bounds","meta","note"] ):
-                    for tag in elem.iter("tag"):
+                if event == 'end' and (elem.tag in ['node', 'way', 'relation', 'bounds','meta','note'] ):
+                    for tag in elem.iter('tag'):
                         # Check if tag is a street name tag,. set street name to street
                             if self.isStreetName(tag):
                                 street = tag.attrib['v']   
@@ -386,7 +386,7 @@ class JsonFile(object):
         created = {}
         node_refs = []
         pos = []
-        if element.tag == "node" or element.tag == "way" :
+        if element.tag == 'node' or element.tag == 'way' :
             node['type'] = element.tag
     
             if 'lat' in element.attrib.keys() and 'lon' in element.attrib.keys():
@@ -419,14 +419,14 @@ class JsonFile(object):
                 node.pop('lat')
                 
             for child in element:
-                if child.tag == "nd":
+                if child.tag == 'nd':
                     try:
-                        node["node_refs"].append(child.attrib['ref'])
+                        node['node_refs'].append(child.attrib['ref'])
                     except:
-                        node["node_refs"] = []
-                        node["node_refs"].append(child.attrib['ref'])
-                elif child.tag == "tag":
-                    if child.attrib['k'].startswith("addr:"):
+                        node['node_refs'] = []
+                        node['node_refs'].append(child.attrib['ref'])
+                elif child.tag == 'tag':
+                    if child.attrib['k'].startswith('addr:'):
                         key = re.sub('addr:', '', child.attrib['k']).strip()
                         if self.lower_colon.match(key):
                             break
@@ -451,17 +451,17 @@ class JsonFile(object):
     def process_map(self, pretty = False):
         # You do not need to change this file
         file_in = self.output_file
-        file_out = "{0}.json".format(file_in[ : -4])
+        file_out = '{0}.json'.format(file_in[ : -4])
         data = []
-        with codecs.open(file_out, "w") as fo:
+        with codecs.open(file_out, 'w') as fo:
             for _, element in ET.iterparse(file_in):
                 el = self.shape_element(element)
                 if el:
                     data.append(el)
                     if pretty:
-                        fo.write(json.dumps(el, indent=2)+"\n")
+                        fo.write(json.dumps(el, indent=2)+'\n')
                     else:
-                        fo.write(json.dumps(el) + "\n")
+                        fo.write(json.dumps(el) + '\n')
         return data
             
 if __name__ == '__main__':
