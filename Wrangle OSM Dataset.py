@@ -346,7 +346,6 @@ class CleanStreets(object):
         
         celaned_streets: Clean sorted defaultdict of street names with correct suffixes
                          (a defaultdict of strings)
-    
         '''
         with open('output.osm', 'w') as output:
             output.write("<?xml version='1.0' encoding='UTF-8'?>\n")
@@ -400,15 +399,24 @@ class JsonFile(object):
         self.output_file = output_file
 
     
-    def shape_element(self, element):
+    def shapeElement(self, element):
+        '''
+        Takes in XML element, shapes it into JSON node as dictionary, returns shaped element.
+        
+        element: XML ElementTree element, which is shaped into JSON node (an ET object)
+        
+        @return: node for JSON file creation (a dictionary)
+        '''
         node = {}
         address = {}
         created = {}
         node_refs = []
         pos = []
+        
         if element.tag == 'node' or element.tag == 'way' :
             node['type'] = element.tag
     
+            # Get and store GPS (lat, lon) cooridinates
             if 'lat' in element.attrib.keys() and 'lon' in element.attrib.keys():
                 try:
                     lat = float(element.attrib['lat'])
@@ -417,19 +425,21 @@ class JsonFile(object):
                     pos.insert(1,lon)
                 except:
                     pass
-                
+            
+            # Get and set {tag : attrib} into dict    
             for k, m in element.attrib.items():
                 if k not in pos:
                     if k in self.created_tags:
                         created[k] = m
                     else:
                         node[k] = m
+                      
+            # Get and set node type into node dict
             if created:
-              node['created'] = created
+                node['created'] = created
             if pos:
                 node['pos'] = pos
             if address:
-                print(address)
                 node['address'] = address
             if node_refs:
                 node['node_refs'] = node_refs
@@ -437,7 +447,8 @@ class JsonFile(object):
                 node.pop('lon')
             if 'lat' in node.keys():
                 node.pop('lat')
-                
+            
+            # Iterate over subtags in element, set attribs when valid
             for child in element:
                 if child.tag == 'nd':
                     try:
@@ -446,6 +457,7 @@ class JsonFile(object):
                         node['node_refs'] = []
                         node['node_refs'].append(child.attrib['ref'])
                 elif child.tag == 'tag':
+                    # Clean and set 'addr:' attrib
                     if child.attrib['k'].startswith('addr:'):
                         key = re.sub('addr:', '', child.attrib['k']).strip()
                         if self.lower_colon.match(key):
@@ -456,26 +468,25 @@ class JsonFile(object):
                             except:
                                 node['address'] = {}
                                 node['address'][key] = child.attrib['v']
+                    # Set already clean 'addr:' attrib
                     else:
                         try:
                             node['address'][child.attrib['k']] = child.attrib['v']
                         except:
                             node['address'] = {}
                             node['address'][child.attrib['k']] = child.attrib['v']
-                        
             return node
         else:
             return None
 
             
-    def process_map(self, pretty = False):
-        # You do not need to change this file
+    def processMap(self, pretty = False):
         file_in = self.output_file
         file_out = '{0}.json'.format(file_in[ : -4])
         data = []
         with codecs.open(file_out, 'w') as fo:
             for _, element in ET.iterparse(file_in):
-                el = self.shape_element(element)
+                el = self.shapeElement(element)
                 if el:
                     data.append(el)
                     if pretty:
@@ -484,15 +495,13 @@ class JsonFile(object):
                         fo.write(json.dumps(el) + '\n')
         return data
             
-if __name__ == '__main__':
-        
+if __name__ == '__main__':    
     # Get OSM File, which is Brooklyn OpenStreetMap
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
     xml_original_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     xml_sample_file = 'sample.osm'  # Sample OSM File output name
     xml_cleaned_file = 'output.osm'
     sample_size = 1
-
 
     # Initialize and create OSM original file and sample file
     osm = OSMFile(xml_original_file, xml_sample_file, sample_size)
@@ -527,6 +536,6 @@ if __name__ == '__main__':
     # Initialize and create JSON file from cleaned XML output.osm file
     print('\nCreating new JSON file from cleaned XML file...')
     js = JsonFile(xml_cleaned_file)
-    js.process_map()
+    js.processMap()
     print('\nDeleting XML cleaned file...')
     os.remove(xml_cleaned_file)
