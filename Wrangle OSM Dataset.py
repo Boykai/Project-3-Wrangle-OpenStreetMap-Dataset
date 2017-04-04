@@ -374,6 +374,25 @@ class CleanStreets(object):
             
 class JsonFile(object):
     def __init__(self, output_file):
+        '''
+        Initialize a JSON File instance, saves all parameters as attributes 
+        of the instance. Takes in an XML file and returns a JSON file      
+        
+        lower: Regex created to find lowercase characters for 
+               tag elements (a regex)
+              
+        lower_colon: Regex created to find lowercase characters for 
+                     tag elements when a colon is included (a regex)
+                     
+        problemchars: Regex created to find special characters for 
+                      tags and tag elements (a regex)
+                        
+        created_tags: Tag element names, which are deemed as acceptable for
+                      adding information (a list of strings)
+                  
+        output_file: XML OSM output file, created in given output_file 
+                     path (a string)  
+        '''
         self.lower = re.compile(r'^([a-z]|_)*$')
         self.lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
         self.problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
