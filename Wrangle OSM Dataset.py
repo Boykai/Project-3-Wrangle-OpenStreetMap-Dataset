@@ -451,7 +451,7 @@ class JsonFile(object):
     def process_map(self, pretty = False):
         # You do not need to change this file
         file_in = self.output_file
-        file_out = "{0}.json".format(file_in)
+        file_out = "{0}.json".format(file_in[ : -4])
         data = []
         with codecs.open(file_out, "w") as fo:
             for _, element in ET.iterparse(file_in):
@@ -468,24 +468,24 @@ if __name__ == '__main__':
         
     # Get OSM File, which is Brooklyn OpenStreetMap
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
-    osm_file = 'brooklyn_new-york.osm'  # Original OSM File input name
-    sample_file = 'sample.osm'  # Sample OSM File output name
-    output_file = 'output.osm'
+    xml_original_file = 'brooklyn_new-york.osm'  # Original OSM File input name
+    xml_sample_file = 'sample.osm'  # Sample OSM File output name
+    xml_cleaned_file = 'output.osm'
     sample_size = 1
 
 
     # Initialize and create OSM original file and sample file
-    osm = OSMFile(osm_file, sample_file, sample_size)
+    osm = OSMFile(xml_original_file, xml_sample_file, sample_size)
     osm.createSampleFile()
     
     # Initialize and clean street type tag attributes
     print('\nInitialzing and getting street type tag attributes...')
-    cleanSt = CleanStreets(sample_file)
+    cleanSt = CleanStreets(xml_sample_file)
 
     # Audit street tag attributes and store vales in unexpected_street dict
     # returns street type keys with street name values dict
     print('\nPerforming audit on street types...')
-    unexpected_streets = cleanSt.audit(sample_file)
+    unexpected_streets = cleanSt.audit(xml_sample_file)
     print('Dictionary of unexpected street name types with street names: ')
     pprint.pprint(unexpected_streets)
 
@@ -500,9 +500,10 @@ if __name__ == '__main__':
     cleanSt.writeClean(clean_streets_dict)
     print('New audit after street names have been replaced with clean street'
           + 'names: ')
-    pprint.pprint(cleanSt.audit(output_file))
+    pprint.pprint(cleanSt.audit(xml_cleaned_file))
     
     # Initialize and create JSON file from cleaned XML output.osm file
-    js = JsonFile(output_file)
+    print('\nCreating new JSON file from cleaned XML file...')
+    js = JsonFile(xml_cleaned_file)
     js.process_map()
 
