@@ -459,7 +459,9 @@ class JsonFile(object):
                         node['node_refs'].append(child.attrib['ref'])
                 elif child.tag == 'tag':
                     # Clean and set 'addr:' attrib
-                    if child.attrib['k'].startswith('addr:'):
+                    if self.problemchars.search(child.attrib['k']):
+                        pass
+                    elif child.attrib['k'].startswith('addr:'):
                         key = re.sub('addr:', '', child.attrib['k']).strip()
                         if self.lower_colon.match(key):
                             break
@@ -518,8 +520,13 @@ if __name__ == '__main__':
     sample_size = 1
 
     # Initialize and create OSM original file and sample file
+    if sample_size == 1:
+        xml_sample_file = xml_original_file
+        
     osm = OSMFile(xml_original_file, xml_sample_file, sample_size)
-    osm.createSampleFile()
+    
+    if sample_size != 1:
+        osm.createSampleFile()
     
     # Initialize and clean street type tag attributes
     print('\nInitialzing and getting street type tag attributes...')
@@ -544,8 +551,9 @@ if __name__ == '__main__':
     print('New audit after street names have been replaced with clean street'
           + 'names: ')
     pprint.pprint(cleanSt.audit(xml_cleaned_file))
-    print('\nDeleting XML sample file...')
-    os.remove(xml_sample_file)
+    if sample_size != 1:
+        print('\nDeleting XML sample file...')
+        os.remove(xml_sample_file)
     
     # Initialize and create JSON file from cleaned XML output.osm file
     print('\nCreating new JSON file from cleaned XML file...')
@@ -558,7 +566,8 @@ if __name__ == '__main__':
     print('\nCreating new MongoDB database \'brooklyn\' from cleaned JSON file...')
     client = MongoClient('mongodb://localhost:27017')
     db = client.osm_results
-    db.brooklyn.insert(data)
+    db.brooklyn.insert_many(data, bypass_document_validation=True)
     print(str(db.brooklyn.find_one()))
+    print('This OSM database contains ' + str(db.brooklyn.count()) + ' elements')
     
                        
