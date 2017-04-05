@@ -567,7 +567,19 @@ if __name__ == '__main__':
     client = MongoClient('mongodb://localhost:27017')
     db = client.osm_results
     db.brooklyn.insert_many(data, bypass_document_validation=True)
-    print(str(db.brooklyn.find_one()))
-    print('This OSM database contains ' + str(db.brooklyn.count()) + ' elements')
     
+    # Run and output MongoDB querires and results
+    print('\nRunning MongoDB queries...')
+    
+    print('\nTotal number of documents: ')
+    print('db.brooklyn.count()')
+    print(str(db.brooklyn.count()))
+    
+    print('\nNumber of \'way\' type documents: ')
+    print('db.brooklyn.find({\'type\' :\'way\'}).count()')
+    print(str(db.brooklyn.find({'type' :'way'}).count()))
+    
+    print('\nNumber of \'node\' type documents: ')
+    print('db.brooklyn.find({\'type\' :\'node\'}).count()')
+    print(str(db.brooklyn.find({'type' :'node'}).count()))
                        
