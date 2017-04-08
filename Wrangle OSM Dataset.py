@@ -12,6 +12,7 @@ import xml.etree.cElementTree as ET  # Use cElementTree or lxml if too slow
 from collections import defaultdict
 import re
 import pprint
+import string
 import codecs
 import json
 import os
@@ -160,7 +161,7 @@ class CleanStreets(object):
                          'Trail',
                          'Walk',
                          'West']
-
+        [self.expected.append(letter) for letter in string.ascii_uppercase]
         self.dirty_to_clean_streets = {'Ave' : 'Avenue',
                                        'Ave.' : 'Avenue',
                                        'Avene' : 'Avenue',
