@@ -9,3 +9,8 @@ The [Brooklyn, New York Open Street Map dataset](https://mapzen.com/data/metro-e
 
 ## Installtion
 The [MongoDB installation guide](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-windows/) should be completed by the user if follow up queries are to be run on the wrangled dataset.
+
+## Wrangling
+### Problems Encountered in The Map
+After initially inspecting the Brooklyn Open Street Map XML dataset the following problem was discovered and will be discussed as to how it was addressed:
+- Inconsistant and over abbreviated street types
