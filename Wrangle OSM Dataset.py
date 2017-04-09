@@ -179,6 +179,7 @@ class CleanStreets(object):
                                        'st' : 'Street',
                                        'St ' : 'Street',
                                        'St. ' : 'Street',
+                                       'Steet'
                                        'street' : 'Street',
                                        'Streeet' : 'Street'}
         
@@ -512,14 +513,15 @@ class JsonFile(object):
         return data
             
         
-if __name__ == '__main__':    
+if __name__ == '__main__':
+        
     # Get OSM File, which is Brooklyn OpenStreetMap
     # https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
     xml_original_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     xml_sample_file = 'sample.osm'  # Sample OSM File output name
     xml_cleaned_file = 'output.osm'
     sample_size = 1
-
+    
     # Initialize and create OSM original file and sample file
     if sample_size == 1:
         xml_sample_file = xml_original_file
@@ -537,21 +539,25 @@ if __name__ == '__main__':
     # returns street type keys with street name values dict
     print('\nPerforming audit on street types...')
     unexpected_streets = cleanSt.audit(xml_sample_file)
+    print('There are ' + str(len(unexpected_streets.values())) + ' unique unexpected streets.')
     print('Dictionary of unexpected street name types with street names: ')
     pprint.pprint(unexpected_streets)
 
     # Clean street values and store cleaned streets in clean_street_dict
     print('\nCleaning street type values...')
     clean_streets_dict = cleanSt.clean(unexpected_streets)
+    print('There are ' + str(len(clean_streets_dict.values())) + ' street names to be replaced.')
     print('Dictionary of dirty street keys and clean street values: ')
     pprint.pprint(clean_streets_dict)
     
     # Find and write clean street names to XML file, save updated XML file
     print('\nCreating new output.osm file with cleaned street types...')
     cleanSt.writeClean(clean_streets_dict)
+    clean_unexpected_streets = cleanSt.audit(xml_cleaned_file)
+    print('There are ' + str(len(unexpected_streets.values())) + ' unique unexpected streets.')
     print('New audit after street names have been replaced with clean street'
           + 'names: ')
-    pprint.pprint(cleanSt.audit(xml_cleaned_file))
+    pprint.pprint(clean_unexpected_streets)
     if sample_size != 1:
         print('\nDeleting XML sample file...')
         os.remove(xml_sample_file)
@@ -562,7 +568,7 @@ if __name__ == '__main__':
     data = js.processMap()
     print('\nDeleting XML cleaned file...')
     os.remove(xml_cleaned_file)
-    
+
     # Initialize and create MongoDB database from JSON document list 'data'
     print('\nCreating new MongoDB database \'brooklyn\' from cleaned JSON file...')
     client = MongoClient('mongodb://localhost:27017')
