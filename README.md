@@ -21,20 +21,24 @@ This section contains basic statistics about the dataset and the MongoDB queries
 #### File sizes
                                                 
 > brooklyn_new-york.osm ......... 653 MB
-output.osm.json .... 697 MB
+
+> output.osm.json .... 697 MB
                                                 
 #### Number of documents
                                                 
 > db.brooklyn.find().count()                                                
-1555851
+
+> 1555851
                                                 
 #### Number of nodes
                                                 
 > db.brooklyn.find({'type' :'node'}).count()
-11470695
+
+> 11470695
                                                 
 #### Number of ways
                                                 
 > db.brooklyn.find({'type' :'way'}).count()
-1591120
+
+> 1591120
                                                 
