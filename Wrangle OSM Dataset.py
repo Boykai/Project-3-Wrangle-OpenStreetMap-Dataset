@@ -589,4 +589,17 @@ if __name__ == '__main__':
     print('\nNumber of \'node\' type documents: ')
     print('db.brooklyn.find({\'type\' :\'node\'}).count()')
     print(str(db.brooklyn.find({'type' :'node'}).count()))
+    
+    print('\nNumber of unique users: ')
+    print('db.brooklyn.distinct({"created.user"}).length')
+    print(str(db.brooklyn.distinct({"created.user"}).length))
+                                                
+    print('\nTop 1 contributing user: ')          
+    print('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])')
+    print(str('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])'))
+                                                
+    print('\nNumber of users appearing only once (having 1 post): ')                                   
+    print('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])')
+    print(str(db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])))
+
                        
