@@ -41,4 +41,24 @@ This section contains basic statistics about the dataset and the MongoDB queries
 > db.brooklyn.find({'type' :'way'}).count()
 
 > 1591120
+
+#### Number of unique users
+                                                
+> db.brooklyn.distinct({"created.user"}).length
+
+> ???
+                                                
+#### Top 1 contributing user
+                                                
+> db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":­1}}, {"$limit":1}])
+
+> ???
+                                                
+#### Number of users appearing only once (having 1 post)
+                                                
+> db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}{"$sort":{"_id":1}}, {"$limit":1}])
+
+> ???
+##### “_id” represents postcount
+
                                                 
