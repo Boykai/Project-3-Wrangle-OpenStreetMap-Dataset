@@ -14,3 +14,27 @@ The [MongoDB installation guide](https://docs.mongodb.com/v3.2/tutorial/install-
 ### Problems Encountered in The Map
 After initially inspecting the Brooklyn Open Street Map XML dataset the following problem was discovered and will be discussed as to how it was addressed:
 - Inconsistant and over abbreviated street types
+
+### Data Overview
+This section contains basic statistics about the dataset and the MongoDB queries used to gather them.
+                                                
+#### File sizes
+                                                
+brooklyn_new-york.osm ......... 653 MB
+output.osm.json .... 697 MB
+                                                
+#### Number of documents
+                                                
+> db.brooklyn.find().count()                                                
+1555851
+                                                
+#### Number of nodes
+                                                
+> db.brooklyn.find({'type' :'node'}).count()
+11470695
+                                                
+#### Number of ways
+                                                
+> db.brooklyn.find({'type' :'way'}).count()
+1591120
+                                                
