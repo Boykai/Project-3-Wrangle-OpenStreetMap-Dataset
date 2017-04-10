@@ -20,7 +20,7 @@ This section contains basic statistics about the dataset and the MongoDB queries
                                                 
 #### File sizes
                                                 
-brooklyn_new-york.osm ......... 653 MB
+> brooklyn_new-york.osm ......... 653 MB
 output.osm.json .... 697 MB
                                                 
 #### Number of documents
