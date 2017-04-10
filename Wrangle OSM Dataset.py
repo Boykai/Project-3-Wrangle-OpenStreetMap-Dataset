@@ -496,7 +496,7 @@ class JsonFile(object):
         @return: List of JSON dictionary shaped node elements (a list)
         '''
         file_in = self.output_file
-        file_out = '{0}.json'.format(file_in[ : -4])
+        file_out = '{0}.json'.format(file_in)
         data = []
         
         # Create JSON output file, shape and map each XML element
@@ -579,8 +579,8 @@ if __name__ == '__main__':
     print('\nRunning MongoDB queries...')
     
     print('\nTotal number of documents: ')
-    print('db.brooklyn.count()')
-    print(str(db.brooklyn.count()))
+    print('db.brooklyn.find().count()')
+    print(str(db.brooklyn.find().count()))
     
     print('\nNumber of \'way\' type documents: ')
     print('db.brooklyn.find({\'type\' :\'way\'}).count()')
