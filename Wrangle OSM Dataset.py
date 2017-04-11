@@ -511,7 +511,13 @@ class JsonFile(object):
                         fo.write(json.dumps(el) + '\n')
                         
         return data
-            
+
+def mongoAggregate(cursor):
+    results_list = []
+    
+    [results_list.append(result) for result in cursor]
+     
+    return results_list
         
 if __name__ == '__main__':
         
@@ -591,26 +597,31 @@ if __name__ == '__main__':
     print(str(db.brooklyn.find({'type' :'node'}).count()))
     
     print('\nNumber of unique users: ')
-    print('db.brooklyn.distinct({"created.user"}).length')
-    print(str(db.brooklyn.distinct({"created.user"}).length))
+    print('len(db.brooklyn.distinct("created.user"))')
+    print(str(len(db.brooklyn.distinct("created.user"))))
                                                 
     print('\nTop 1 contributing user: ')          
     print('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])')
-    print(str('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])'))
+    top_contributor = mongoAggregate(db.brooklyn.aggregate[{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])
+    print(str(top_contributor[0]))
                                                 
     print('\nNumber of users appearing only once (having 1 post): ')                                   
     print('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])')
-    print(str(db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])))
+    unique_user_count = mongoAggregate(db.brooklyn.aggregate[{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])
+    print(str(unique_user_count[0]))
 
                        
     print('\nTop 10 appearing amenities: ')
     print('db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}}}, {"$group":{"_id":"$amenity", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":10}])')
-    print(str(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}}}, {"$group":{"_id":"$amenity", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":10}])))                   
+    top_10_amenities = mongoAggregate(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}}}, {"$group":{"_id":"$amenity", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":10}]))
+    print(str(top_10_amenities))
                                         
     print('\nHighest population religion: ')
     print('db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"place_of_worship"}}, {"$group":{"_id":"$religion", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])')
-    print(str(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"place_of_worship"}}, {"$group":{"_id":"$religion", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])))
+    most_pop_religion = mongoAggregate(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"place_of_worship"}}, {"$group":{"_id":"$religion", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}]))
+    print(str(most_pop_religion))
                                              
     print('\nMost popular cuisines: ')          
     print('db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"restaurant"}}, {"$group":{"_id":"$cuisine", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":2}])')
-    print(str(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"restaurant"}}, {"$group":{"_id":"$cuisine", "count":{"$sum":1}}}, {"$sort":{"count":}}, {"$limit":2}])))
+    most_pop_cuisine = db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"restaurant"}}, {"$group":{"_id":"$cuisine", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":2}])
+    print(str(most_pop_cuisine))
