@@ -22,43 +22,43 @@ This section contains basic statistics about the dataset and the MongoDB queries
                                                 
 > brooklyn_new-york.osm ......... 653 MB
 
-> output.osm.json .... 697 MB
+> output.osm.json .... 719 MB
                                                 
 #### Number of documents
                                                 
 > db.brooklyn.find().count()                                                
 
-> 1555851
+> 18594867
                                                 
 #### Number of nodes
                                                 
 > db.brooklyn.find({'type' :'node'}).count()
 
-> 11470695
+> 18947436
                                                 
 #### Number of ways
                                                 
 > db.brooklyn.find({'type' :'way'}).count()
 
-> 1591120
+> 2705385
 
 #### Number of unique users
                                                 
-> db.brooklyn.distinct({"created.user"}).length
+> len(db.brooklyn.distinct("created.user"))
 
-> ???
+> 1574
                                                 
 #### Top 1 contributing user
                                                 
-> db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":­1}}, {"$limit":1}])
+> db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])
 
-> ???
+> {u'_id': u'haoyu', u'count': 5}
                                                 
 #### Number of users appearing only once (having 1 post)
                                                 
 > db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}{"$sort":{"_id":1}}, {"$limit":1}])
 
-> ???
+> {u'_id': 5, u'num_users': 65}
 ##### “_id” represents postcount
 
                                                 
