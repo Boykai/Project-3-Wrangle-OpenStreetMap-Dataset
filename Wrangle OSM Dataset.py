@@ -513,6 +513,14 @@ class JsonFile(object):
         return data
 
 def mongoAggregate(cursor):
+    '''
+    Takes in pymongo aggregate cursor object, iterates through each element
+    within the aggregation, then returns the list of elements
+    
+    cursor: pymongo aggreate cursor object, which is iterated (a cursor object)
+    
+    @return: List of aggregation elements (a list)
+    '''
     results_list = []
     
     [results_list.append(result) for result in cursor]
