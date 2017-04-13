@@ -269,7 +269,7 @@ class CleanStreets(object):
                     for tag in elem.iter('tag'):
                         if self.isStreetName(tag):
                             self.auditStreetType(street_types, tag.attrib['v'])
-
+                           
         street_types = self.sortStreets(street_types)
 
         return street_types
