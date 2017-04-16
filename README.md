@@ -7,13 +7,13 @@ You will choose any area of the world in [Open Street Map](https://www.openstree
 ## Dataset
 The [Brooklyn, New York Open Street Map dataset](https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/) was used for wrangling, cleaning, and querying the MongoDB database. The [XML](https://s3.amazonaws.com/metro-extracts.mapzen.com/brooklyn_new-york.osm.bz2) file type was used while exploring this dataset.
 
-## Installtion
+## Installation
 The [MongoDB installation guide](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-windows/) should be completed by the user if follow up queries are to be run on the wrangled dataset.
 
 ## Wrangling
 ### Problems Encountered in The Map
 After initially inspecting the Brooklyn Open Street Map XML dataset the following problem was discovered and will be discussed as to how it was addressed:
-- Inconsistant and over abbreviated street types
+- Inconsistent and over abbreviated street types
 
 ### Data Overview
 This section contains basic statistics about the dataset and the MongoDB queries used to gather them.
