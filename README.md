@@ -15,6 +15,19 @@ The [MongoDB installation guide](https://docs.mongodb.com/v3.2/tutorial/install-
 After initially inspecting the Brooklyn Open Street Map XML dataset the following problem was discovered and will be discussed as to how it was addressed:
 - Inconsistent and over abbreviated street types
 
+
+#### Unexpected Street Names Types
+ '507': set(['Mott St #507']),
+ '7th': set(['32nd street with 7th']),
+ '861': set(['861']),
+ 'A28': set(['wyckoff ave unit A28']),
+ 'Floor': set(['Dekalb Ave, 2nd Floor', 'Wall Street 12th Floor']),
+ 'Floor)': set(['Manhattan Avenue (2nd Floor)']),
+ 'Plz': set(['University Plz']),
+ 'Rb': set(['Linden Boulevard Outer Eb Rb']),
+ 'bus_stop': set(['bus_stop']),
+ 'floor': set(['DeKalb Avenue 4 floor'])}
+ 
 ### Data Overview
 This section contains basic statistics about the dataset and the MongoDB queries used to gather them.
                                                 
