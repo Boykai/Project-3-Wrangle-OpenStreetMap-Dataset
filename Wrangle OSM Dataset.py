@@ -219,6 +219,31 @@ class CleanStreets(object):
                                        'Steet' : 'Street',
                                        'street' : 'Street',
                                        'Streeet' : 'Street'}
+        self.clean_streets_dict = {'Graham Avenue #1' : 'Graham Avenue',
+                                 'Nostrand Avenue,  #107' : 'Nostrand Avenue',
+                                 '305 Schermerhorn St., Brooklyn, NY 11217' : 'Schermerhorn Street',
+                                 '1st' : '1st Avenue',
+                                 'Coney Island Avenue, Ste 200' : 'Coney Island Avenue',
+                                 'Broadway #205' : 'Broadway',
+                                 '218650358': 'NaN',
+                                 '16th Street # 3' : '16th Street', 
+                                 'Hanover Square #3' : 'Hanover Square',
+                                 'Union Avenue 4B' : 'Union Avenue',
+                                 'Joralemon Street, #4CF' : 'Joralemon Street',
+                                 'Main St., Suite 500' : 'Main Street',
+                                 'Broadway #506' : 'Broadway',
+                                 'Mott St #507' : 'Mott Street',
+                                 '32nd street with 7th' : '32nd Street',
+                                 '861' : 'NaN',
+                                 'wyckoff ave unit A28' : 'Wyckoff Aveune',
+                                 'Dekalb Ave, 2nd Floor' : 'Dekalb Aveune', 
+                                 'Wall Street 12th Floor' : 'Wall Street',
+                                 'Manhattan Avenue (2nd Floor)' : 'Manhattan Avenue',
+                                 'University Plz' : ' University Plaza',
+                                 'Linden Boulevard Outer Eb Rb' : 'Linden Boulevard',
+                                 'bus_stop' : 'NaN',
+                                 'DeKalb Avenue 4 floor' : 'Dekalb Avenue'}
+
         
         
         
@@ -349,7 +374,6 @@ class CleanStreets(object):
         @return: Clean sorted defaultdict of street names with correct suffixes
                  (a defaultdict of strings)
         '''
-        clean_streets_dict = {}
         unexpected_streets = unexpected_dirty_streets.copy()
         
         
@@ -368,9 +392,9 @@ class CleanStreets(object):
                     
                     # Save each unacceptabled street as [key] to 
                     # acceptable street as [value] in clean_streets_dict
-                    clean_streets_dict[bad_street] = good_street
+                    self.clean_streets_dict[bad_street] = good_street
 
-        return clean_streets_dict
+        return self.clean_streets_dict
 
         
     def writeClean(self, cleaned_streets):
