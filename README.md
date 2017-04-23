@@ -12,8 +12,9 @@ The [MongoDB installation guide](https://docs.mongodb.com/v3.2/tutorial/install-
 
 ## Wrangling
 ### Problems Encountered in The Map
-After initially inspecting the Brooklyn Open Street Map XML dataset the following problem was discovered and will be discussed as to how it was addressed:
+After initially inspecting the Brooklyn Open Street Map XML dataset the following problems were discovered and will be discussed as to how it was addressed:
 - Inconsistent and over abbreviated street types
+- Invalid zip codes
 
 
 #### Unexpected Street Names Types
