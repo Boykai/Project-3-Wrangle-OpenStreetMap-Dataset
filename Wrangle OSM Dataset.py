@@ -124,10 +124,13 @@ class CleanStreets(object):
                         tag attributes. (a regex)
                         
         expected: Expected street names, street names which are deemed as 
-                  acceptable format. (a list of strings)
+                  acceptable format (a list of strings)
                   
         mapping: Keys that are found as street suffix for tag attributes are 
-                 to be replaced by key's value. (a string dictonary of strings)
+                 to be replaced by key's value (a string dictonary of strings)
+                 
+        clean_streets_dict: Dictionary mapping dirty street names to clean
+                            street names (a dictionary of strings)
         '''
         self.sample_file = sample_file
         self.street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
