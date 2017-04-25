@@ -75,4 +75,9 @@ This section contains basic statistics about the dataset and the MongoDB queries
 > {u'_id': 5, u'num_users': 65}
 ##### “_id” represents postcount
 
-                                                
+## References
+ * https://www.openstreetmap.org
+ * https://review.udacity.com/#!/rubrics/25/view
+ * https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
+ * https://s3.amazonaws.com/metro-extracts.mapzen.com/brooklyn_new-york.osm.bz2
+ * https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-windows/
