@@ -75,6 +75,8 @@ This section contains basic statistics about the dataset and the MongoDB queries
 > {u'_id': 5, u'num_users': 65}
 ##### “_id” represents postcount
 
+## Conclusion
+
 ## References
  * https://www.openstreetmap.org
  * https://review.udacity.com/#!/rubrics/25/view
