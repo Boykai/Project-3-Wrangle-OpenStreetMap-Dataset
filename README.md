@@ -75,6 +75,8 @@ This section contains basic statistics about the dataset and the MongoDB queries
 > {u'_id': 5, u'num_users': 65}
 ##### “_id” represents postcount
 
+#### Number of nodes with same zip code
+
 ## Conclusion
 
 ## References
