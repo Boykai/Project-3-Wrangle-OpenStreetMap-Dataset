@@ -412,7 +412,7 @@ class CleanStreets(object):
                             self.auditStreetType(street_types, tag.attrib['v'])
                         if self.isZipCode(tag):
                             self.auditZipType(zip_types, tag.attrib['v'])
-                           
+                elem.clear()           
         street_types = self.sortStreets(street_types)
 
         return [street_types, zip_types]
@@ -517,6 +517,7 @@ class CleanStreets(object):
                     # Move the write function inside the condition, so that it only writes
                     # tags that you specify (i.e. everything apart from the root <osm> element)
                     output.write(ET.tostring(elem, encoding='utf-8'))
+                    elem.clear()
             output.write('</osm>')
             osm_file.close()
 
@@ -549,6 +550,25 @@ class JsonFile(object):
         self.output_file = output_file
 
     
+    def getElement(self, file_in, tags=('node', 'way', 'relation')):
+        '''
+        XML tag element generator
+        
+        tags: tag elements to search for in OSM file (a tuple of strings)
+        
+        @yield element if it is the right type of tag
+
+        Reference:
+        http://stackoverflow.com/questions/3095434/inserting-newlines-in-xml-file-generated-via-xml-etree-elementtree-in-python
+        '''
+        context = iter(ET.iterparse(file_in, events=('start', 'end')))
+        _, root = next(context)
+        
+        for event, elem in context:
+            if event == 'end' and elem.tag in tags:
+                yield elem
+                root.clear()    
+        
     def shapeElement(self, element):
         '''
         Takes in XML element, shapes it into JSON node as dictionary, returns shaped element.
@@ -646,6 +666,7 @@ class JsonFile(object):
         file_out = '{0}.json'.format(file_in)
         data = []
         
+        '''
         # Create JSON output file, shape and map each XML element
         with codecs.open(file_out, 'w') as fo:
             for _, element in ET.iterparse(file_in):
@@ -653,12 +674,23 @@ class JsonFile(object):
                 if el:
                     data.append(el)
                     if pretty:
-                        fo.write(json.dumps(el, indent=2)+'\n')
+                        fo.write(json.dumps(el, indent=2) + '\n')
+                    else:
+                        fo.write(json.dumps(el) + '\n')
+
+        return data
+        '''
+        with codecs.open(file_out, 'w') as fo:
+            for i, element in enumerate(self.getElement(file_in)):
+                el = self.shapeElement(element)
+                if el:
+                    data.append(el)
+                    if pretty:
+                        fo.write(json.dumps(el, indent = 2) + '\n')
                     else:
                         fo.write(json.dumps(el) + '\n')
                         
         return data
-
 def mongoAggregate(cursor):
     '''
     Takes in pymongo aggregate cursor object, iterates through each element
@@ -681,7 +713,7 @@ if __name__ == '__main__':
     xml_original_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     xml_sample_file = 'sample.osm'  # Sample OSM File output name
     xml_cleaned_file = 'output.osm'
-    sample_size = 1
+    sample_size = 100
     
     # Initialize and create OSM original file and sample file
     if sample_size == 1:
@@ -724,11 +756,9 @@ if __name__ == '__main__':
     cleanSt.writeClean(clean_streets_dict)
     clean_audit_results = cleanSt.audit(xml_sample_file)
     clean_unexpected_streets = clean_audit_results[0]
-    clean_unexpected_zips = clean_audit_results[1]
     
     print('There are ' + str(len(clean_unexpected_streets.values())) + ' unique unexpected streets.')
-    print('New audit after street names have been replaced with clean street'
-          + 'names: ')
+    print('New audit after street names have been replaced with clean street names: ')
     pprint.pprint(clean_unexpected_streets)
     
     if sample_size != 1:
