@@ -42,19 +42,19 @@ This section contains basic statistics about the dataset and the MongoDB queries
                                                 
 > db.brooklyn.find().count()                                                
 
-> 24563873
+> 39516234
 
 #### Number of ways
                                                 
 > db.brooklyn.find({'type' :'way'}).count()
 
-> 4674409
+> 6156100
 
 #### Number of nodes
                                                 
 > db.brooklyn.find({'type' :'node'}).count()
 
-> 28916424
+> 36418088
 
 #### Number of unique users
                                                 
