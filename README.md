@@ -17,18 +17,32 @@ After initially inspecting the Brooklyn Open Street Map XML dataset the followin
 - Invalid zip codes
 
 
-#### Unexpected Street Names Types
- '507': set(['Mott St #507']),
- '7th': set(['32nd street with 7th']),
- '861': set(['861']),
- 'A28': set(['wyckoff ave unit A28']),
- 'Floor': set(['Dekalb Ave, 2nd Floor', 'Wall Street 12th Floor']),
- 'Floor)': set(['Manhattan Avenue (2nd Floor)']),
- 'Plz': set(['University Plz']),
- 'Rb': set(['Linden Boulevard Outer Eb Rb']),
- 'bus_stop': set(['bus_stop']),
- 'floor': set(['DeKalb Avenue 4 floor'])}
- 
+#### Unexpected Street Names Types Examples
+ * '507': set(['Mott St #507']),
+ * '7th': set(['32nd street with 7th']),
+ * '861': set(['861']),
+ * 'A28': set(['wyckoff ave unit A28']),
+ * 'Floor': set(['Dekalb Ave, 2nd Floor', 'Wall Street 12th Floor']),
+ * 'Floor)': set(['Manhattan Avenue (2nd Floor)']),
+ * 'Plz': set(['University Plz']),
+ * 'Rb': set(['Linden Boulevard Outer Eb Rb']),
+ * 'bus_stop': set(['bus_stop']),
+ * 'floor': set(['DeKalb Avenue 4 floor'])}
+
+Out of all the street names in the dataset from the Brooklyn OSM XML file, there were 99 unique street names that needed to be changed or deleted. For example, '11th St.' should be '11th Street', with abbreviations and some other unexpected street types the cleaning was done systematically through regular expressions and replacing the values when writing a clean XML file. Other street types had to be hard coded to change the values to the correct values when writing the output file, for example '305 Schermerhorn St., Brooklyn, NY 11217' should be 'Schermerhorn Street'. All other street types that did not make sense, or the true value could not be determined were changed to 'NaN'.
+
+
+#### Unexpected Zip Code Examples
+ * '10004'
+ * '10005'
+ * '10006'
+ * '10007'
+ * '10001'
+ * '10002'
+ * '10003'
+
+All unexpected zip codes found that were not listed in the [government NYC Brooklyn zip code](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm) was replaced with 'NaN' value.
+
 ### Data Overview
 This section contains basic statistics about the dataset and the MongoDB queries used to gather them.
                                                 
@@ -42,19 +56,19 @@ This section contains basic statistics about the dataset and the MongoDB queries
                                                 
 > db.brooklyn.find().count()                                                
 
-> 39516234
+> 42515662
 
 #### Number of ways
                                                 
 > db.brooklyn.find({'type' :'way'}).count()
 
-> 6156100
+> 6650816
 
 #### Number of nodes
                                                 
 > db.brooklyn.find({'type' :'node'}).count()
 
-> 36418088
+> 38922800
 
 #### Number of unique users
                                                 
@@ -64,20 +78,66 @@ This section contains basic statistics about the dataset and the MongoDB queries
                                                 
 #### Top 1 contributing user
                                                 
-> db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])
+> db.brooklyn.aggregate([{'$group':
+                             {'_id':'$created.user', 
+                              'count':{'$sum':1}}}, 
+                         {'$sort':{'count':1}}, 
+                         {'$limit':1}])
 
-> {u'_id': u'haoyu', u'count': 5}
+> {u'count': 13, u'_id': u'haoyu'}
                                                 
 #### Number of users appearing only once (having 1 post)
                                                 
-> db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}{"$sort":{"_id":1}}, {"$limit":1}])
+> db.brooklyn.aggregate([{'$group':
+                             {'_id':'$created.user', 
+                              'count':{'$sum':1}}}, 
+                         {'$group':
+                             {'_id':'$count', 
+                              'num_users':{'$sum':1}}}, 
+                         {'$sort':{'_id':1}}, 
+                         {'$limit':1}])
 
-> {u'_id': 5, u'num_users': 65}
-##### “_id” represents postcount
+> {u'num_users': 65, u'_id': 13}
 
-#### Number of nodes with same zip code
+#### Top 10 appearing amenities
+
+> db.brooklyn.aggregate([{'$match':
+                           {'amenity':{'$exists':1}}}, 
+                       {'$group':
+                           {'_id':'$amenity', 
+                            'count':{'$sum':1}}}, 
+                       {'$sort':{'count':1}}, 
+                       {"$limit":10}])
+>
+
+#### Highest population religion
+
+> db.brooklyn.aggregate([{'$match':
+                             {'amenity':{'$exists':1}, 
+                              'amenity':'place_of_worship'}}, 
+                         {'$group':
+                             {'_id':'$religion', 
+                              'count':{'$sum':1}}}, 
+                         {'$sort':{'count':1}}, 
+                         {'$limit':1}])
+
+>
+
+#### Most popular cuisines
+
+> db.brooklyn.aggregate([{'$match':
+                             {'amenity':{'$exists':1}, 
+                              'amenity':'restaurant'}}, 
+                         {'$group':
+                             {'_id':'$cuisine', 
+                              'count':{'$sum':1}}}, 
+                         {'$sort':{'count':1}}, 
+                         {'$limit':2}])
+                         
+>
 
 ## Conclusion
+The Open Street Map Brooklyn XML file had many errors for just the street types and the zip codes alone. The errors or inconsistences found are not that surprising given the size and scope of Brooklyn and the OSM file. The Brooklyn OSM file has over, 42 million documents, 6 million streets, and 38 million locations within the XML file. Given the vast size of the dataset, the dataset was relatively clean but, only the street types and zip codes were wrangled and cleaned in this analysis. The dirtiness of the Brooklyn OSM XML dataset found in this analysis is just the tip of the iceberg if a 100% cleaned dataset is desired.
 
 ## References
  * https://www.openstreetmap.org
@@ -85,3 +145,4 @@ This section contains basic statistics about the dataset and the MongoDB queries
  * https://mapzen.com/data/metro-extracts/metro/brooklyn_new-york/
  * https://s3.amazonaws.com/metro-extracts.mapzen.com/brooklyn_new-york.osm.bz2
  * https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-windows/
+ * https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm
