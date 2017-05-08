@@ -131,6 +131,8 @@ class CleanStreets(object):
                  
         clean_streets_dict: Dictionary mapping dirty street names to clean
                             street names (a dictionary of strings)
+                            
+        expected_zip: List of valid Brooklyn zip codes (a list of strings)
         '''
         self.sample_file = sample_file
         self.street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
@@ -246,6 +248,43 @@ class CleanStreets(object):
                                    'Linden Boulevard Outer Eb Rb' : 'Linden Boulevard',
                                    'bus_stop' : 'NaN',
                                    'DeKalb Avenue 4 floor' : 'Dekalb Avenue'}
+        self.expected_zip = ['11201', 
+                             '11203', 
+                             '11204', 
+                             '11205', 
+                             '11206', 
+                             '11207', 
+                             '11208', 
+                             '11209', 
+                             '11210', 
+                             '11211', 
+                             '11212', 
+                             '11213', 
+                             '11214', 
+                             '11215', 
+                             '11216', 
+                             '11217', 
+                             '11218', 
+                             '11219', 
+                             '11220', 
+                             '11221', 
+                             '11222', 
+                             '11223', 
+                             '11224', 
+                             '11225', 
+                             '11226', 
+                             '11228', 
+                             '11229', 
+                             '11230', 
+                             '11231', 
+                             '11232', 
+                             '11233', 
+                             '11234', 
+                             '11235', 
+                             '11236', 
+                             '11237', 
+                             '11238', 
+                             '11239']
 
         
         
@@ -277,11 +316,17 @@ class CleanStreets(object):
         '''
         return self.dirty_to_clean_streets
         
-    def getCleanStreetDict(self)     :
+    def getCleanStreetDict(self):
         '''
         @return clean street dict. (a dictionary of strings)
         '''
         return self.clean_street_dict
+        
+    def getExpectedZip(self):
+        '''
+        @return list of expected zip codes for Brooklyn. (a list of strings)
+        '''
+        return self.expected_zip
         
     def auditStreetType(self, street_types, street_name):
         '''
