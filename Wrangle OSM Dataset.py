@@ -713,7 +713,7 @@ if __name__ == '__main__':
     xml_original_file = 'brooklyn_new-york.osm'  # Original OSM File input name
     xml_sample_file = 'sample.osm'  # Sample OSM File output name
     xml_cleaned_file = 'output.osm'
-    sample_size = 100
+    sample_size = 1
     
     # Initialize and create OSM original file and sample file
     if sample_size == 1:
@@ -777,6 +777,7 @@ if __name__ == '__main__':
     client = MongoClient('mongodb://localhost:27017')
     db = client.osm_results
     db.brooklyn.insert_many(data, bypass_document_validation=True)
+    del data[:]
     
     # Run and output MongoDB querires and results
     print('\nRunning MongoDB queries...')
