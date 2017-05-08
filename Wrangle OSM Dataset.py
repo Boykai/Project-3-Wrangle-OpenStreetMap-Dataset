@@ -795,31 +795,72 @@ if __name__ == '__main__':
     print(str(db.brooklyn.find({'type' :'node'}).count()))
     
     print('\nNumber of unique users: ')
-    print('len(db.brooklyn.distinct("created.user"))')
-    print(str(len(db.brooklyn.distinct("created.user"))))
+    print('len(db.brooklyn.distinct(\'created.user\'))')
+    print(str(len(db.brooklyn.distinct('created.user'))))
                                                 
-    print('\nTop 1 contributing user: ')          
-    print('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])')
-    top_contributor = mongoAggregate(db.brooklyn.aggregate[{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])
+    print('\nTop 1 contributing user: ')
+    top_contributor_pipeline = [{'$group':
+                                    {'_id':'$created.user', 
+                                     'count':{'$sum':1}}}, 
+                                {'$sort':
+                                    {'count':1}}, 
+                                {'$limit':1}]
+    print('db.brooklyn.aggregate(' + str(top_contributor_pipeline) + ')')
+    top_contributor = mongoAggregate(db.brooklyn.aggregate(top_contributor_pipeline))
     print(str(top_contributor[0]))
                                                 
-    print('\nNumber of users appearing only once (having 1 post): ')                                   
-    print('db.brooklyn.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])')
-    unique_user_count = mongoAggregate(db.brooklyn.aggregate[{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])
+    print('\nNumber of users appearing only once (having 1 post): ')
+    unique_user_count_pipeline =[{'$group':
+                                     {'_id':'$created.user', 
+                                     'count':{'$sum':1}}}, 
+                                {'$group':
+                                    {'_id':'$count', 
+                                    'num_users':{'$sum':1}}}, 
+                                {'$sort':
+                                    {'_id':1}}, 
+                                {'$limit':1}]                                    
+    print('db.brooklyn.aggregate(' + str(unique_user_count_pipeline) + ')')
+    unique_user_count = mongoAggregate(db.brooklyn.aggregate(unique_user_count_pipeline))
     print(str(unique_user_count[0]))
 
                        
     print('\nTop 10 appearing amenities: ')
-    print('db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}}}, {"$group":{"_id":"$amenity", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":10}])')
-    top_10_amenities = mongoAggregate(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}}}, {"$group":{"_id":"$amenity", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":10}]))
+    top_10_amenities_pipeline = [{'$match':
+                                     {'amenity':{'$exists':1}}}, 
+                                 {'$group':
+                                     {'_id':'$amenity', 
+                                     'count':{'$sum':1}}}, 
+                                {'$sort':
+                                     {'count':1}}, 
+                                {"$limit":10}]
+    print('db.brooklyn.aggregate(' + str(top_10_amenities_pipeline) + ')')
+    top_10_amenities = mongoAggregate(db.brooklyn.aggregate(top_10_amenities_pipeline))
     print(str(top_10_amenities))
                                         
     print('\nHighest population religion: ')
-    print('db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"place_of_worship"}}, {"$group":{"_id":"$religion", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}])')
-    most_pop_religion = mongoAggregate(db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"place_of_worship"}}, {"$group":{"_id":"$religion", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":1}]))
+    most_pop_religion_pipeline = [{'$match':
+                                      {'amenity':{'$exists':1}, 
+                                      'amenity':'place_of_worship'}}, 
+                                  {'$group':
+                                      {'_id':'$religion', 
+                                      'count':{'$sum':1}}}, 
+                                  {'$sort':
+                                      {'count':1}}, 
+                                  {'$limit':1}]
+    print('db.brooklyn.aggregate(' + str(most_pop_religion_pipeline) + ')')
+    most_pop_religion = mongoAggregate(db.brooklyn.aggregate(most_pop_religion_pipeline))
     print(str(most_pop_religion))
                                              
-    print('\nMost popular cuisines: ')          
-    print('db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"restaurant"}}, {"$group":{"_id":"$cuisine", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":2}])')
-    most_pop_cuisine = db.brooklyn.aggregate([{"$match":{"amenity":{"$exists":1}, "amenity":"restaurant"}}, {"$group":{"_id":"$cuisine", "count":{"$sum":1}}}, {"$sort":{"count":1}}, {"$limit":2}])
+    print('\nMost popular cuisines: ')
+    most_pop_cuisine_pipeline = [{'$match':
+                                     {'amenity':{'$exists':1}, 
+                                     'amenity':'restaurant'}}, 
+                                 {'$group':
+                                     {'_id':'$cuisine', 
+                                     'count':{'$sum':1}}}, 
+                                 {'$sort':
+                                     {'count':1}}, 
+                                {'$limit':2}]          
+    print('db.brooklyn.aggregate(' + str(most_pop_cuisine_pipeline) + ')')
+    most_pop_cuisine = mongoAggregate(db.brooklyn.aggregate(most_pop_cuisine_pipeline))
     print(str(most_pop_cuisine))
