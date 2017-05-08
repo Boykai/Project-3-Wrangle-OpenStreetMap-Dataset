@@ -277,6 +277,11 @@ class CleanStreets(object):
         '''
         return self.dirty_to_clean_streets
         
+    def getCleanStreetDict(self)     :
+        '''
+        @return clean street dict. (a dictionary of strings)
+        '''
+        return self.clean_street_dict
         
     def auditStreetType(self, street_types, street_name):
         '''
@@ -624,7 +629,7 @@ if __name__ == '__main__':
     # Clean street values and store cleaned streets in clean_street_dict
     print('\nCleaning street type values...')
     clean_streets_dict = cleanSt.clean(unexpected_streets)
-    print('There are ' + str(len(clean_streets_dict.values())) + ' street names to be replaced.')
+    print('There are ' + str(len(cleanSt.getCleanStreetDict().values())) + ' street names to be replaced.')
     print('Dictionary of dirty street keys and clean street values: ')
     pprint.pprint(clean_streets_dict)
     
