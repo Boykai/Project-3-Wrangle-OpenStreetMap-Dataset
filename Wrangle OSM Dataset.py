@@ -363,7 +363,16 @@ class CleanStreets(object):
         '''
         return (elem.attrib['k'] == 'addr:street')
 
+    def isZipCode(self, elem):
+        '''
+        Evaluates if tag attribute is equal to a address of type postcode.
 
+        elem: XML tag element object (a object)
+
+        @return: Bool if the tag attribute is equal to a address of type postcode.
+        '''
+        return (elem.attrib['k'] == 'addr:postcode')
+        
     def audit(self, audit_file):
         '''
         Iterates over XML tag elements in order to find all of the addresses 
