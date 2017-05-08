@@ -316,11 +316,11 @@ class CleanStreets(object):
         '''
         return self.dirty_to_clean_streets
         
-    def getCleanStreetDict(self):
+    def getCleanStreetsDict(self):
         '''
         @return clean street dict. (a dictionary of strings)
         '''
-        return self.clean_street_dict
+        return self.clean_streets_dict
         
     def getExpectedZip(self):
         '''
@@ -340,7 +340,7 @@ class CleanStreets(object):
         in street_types defaultdict.
 
         street_types: Street type is a dictionary set, which is mutated within 
-                      the function, passed from aduit function. 
+                      the function, passed from audit function. 
                       (a string defaultdict set of strings)
                       
         street_name: Street name string value found in tag attribute. (a string)
@@ -352,6 +352,22 @@ class CleanStreets(object):
             if street_type not in self.getExpected():
                 street_types[street_type].add(street_name)
 
+    def auditZipType(self, zip_types, zip_name):
+        '''
+        Audits zip code type by checking if the zip type is in the list 
+        of expected zip type values.
+
+        The string of zip_name is the value set to the zip_type key 
+        in zip_types defaultdict.
+
+        zip_types: Zip type is a dictionary set, which is mutated within 
+                      the function, passed from audit function. 
+                      (a string defaultdict set of strings)
+                      
+        zip_name: Zip name string value found in tag attribute. (a string)
+        '''
+        if zip_name not in self.getExpectedZip():
+            zip_types[zip_name].add('NaN')
                 
     def isStreetName(self, elem):
         '''
@@ -386,6 +402,7 @@ class CleanStreets(object):
         '''
         with open(audit_file, 'r') as f:
             street_types = defaultdict(set)
+            zip_types = defaultdict(set)
             f.seek(0)
 
             for event, elem in ET.iterparse(f, events=('start',)):
@@ -393,10 +410,12 @@ class CleanStreets(object):
                     for tag in elem.iter('tag'):
                         if self.isStreetName(tag):
                             self.auditStreetType(street_types, tag.attrib['v'])
+                        if self.isZipCode(tag):
+                            self.auditZipType(zip_types, tag.attrib['v'])
                            
         street_types = self.sortStreets(street_types)
 
-        return street_types
+        return [street_types, zip_types]
 
         
     def sortStreets(self, unsorted_streets):
@@ -425,12 +444,12 @@ class CleanStreets(object):
         Get unexpected street suffixes and replace with acceptable street
         suffixes when determined that the data is unacceptably dirty.
         
-        Assumes that every key given by self.aduit() is of type string.
+        Assumes that every key given by self.audit() is of type string.
         
         Assumes that every assigned to a key value given by self.adult() is of
         type string.
         
-        Assumes that every key given by self.aduit() has valid string value.
+        Assumes that every key given by self.audit() has valid string value.
         
         
         @return: Clean sorted defaultdict of street names with correct suffixes
@@ -479,18 +498,23 @@ class CleanStreets(object):
             osm_file = open(self.getSampleFile(), 'r')
             
             for event, elem in ET.iterparse(osm_file, events=('start', 'end')):
-                # 1. begin processing when the end of the element is reached
-                # 2. Include all elements, except 'osm', for processing (so that your files are identical)
+                # Begin processing when the end of the element is reached
+                # Include all elements, except 'osm', for processing (so that your files are identical)
                 if event == 'end' and (elem.tag in ['node', 'way', 'relation', 'bounds','meta','note'] ):
                     for tag in elem.iter('tag'):
-                        # Check if tag is a street name tag,. set street name to street
+                        # Check if tag is a street name tag, set street name to street
                             if self.isStreetName(tag):
                                 street = tag.attrib['v']   
                                 # If street name is in clean streets dict, replace
                                 # dirty street with clean street value
                                 if street in cleaned_streets.keys(): 
                                     tag.attrib['v'] = cleaned_streets[street]
-                    # 3. move the write function inside the condition, so that it only writes
+                        # Check if tag is a zip code tag, set zip code to 'NaN' if not valid
+                            if self.isZipCode(tag):
+                                zip_code = tag.attrib['v']
+                                if zip_code not in self.getExpectedZip():
+                                    tag.attrib['v'] = 'NaN'
+                    # Move the write function inside the condition, so that it only writes
                     # tags that you specify (i.e. everything apart from the root <osm> element)
                     output.write(ET.tostring(elem, encoding='utf-8'))
             output.write('</osm>')
@@ -675,26 +699,38 @@ if __name__ == '__main__':
     # Audit street tag attributes and store vales in unexpected_street dict
     # returns street type keys with street name values dict
     print('\nPerforming audit on street types...')
-    unexpected_streets = cleanSt.audit(xml_sample_file)
+    audit_results = cleanSt.audit(xml_sample_file)
+    unexpected_streets = audit_results[0]
+    unexpected_zips = audit_results[1]
+    
     print('There are ' + str(len(unexpected_streets.values())) + ' unique unexpected streets.')
     print('Dictionary of unexpected street name types with street names: ')
     pprint.pprint(unexpected_streets)
+    
+    print('\nThere are ' + str(len(unexpected_zips.values())) + ' unique unexpected zip codes.')
+    print('Dictionary of unexpected zip code types with street names: ')
+    pprint.pprint(unexpected_zips)
 
     # Clean street values and store cleaned streets in clean_street_dict
     print('\nCleaning street type values...')
     clean_streets_dict = cleanSt.clean(unexpected_streets)
-    print('There are ' + str(len(cleanSt.getCleanStreetDict().values())) + ' street names to be replaced.')
+    print('There are ' + str(len(cleanSt.getCleanStreetsDict().values())) + ' street names to be replaced.')
     print('Dictionary of dirty street keys and clean street values: ')
     pprint.pprint(clean_streets_dict)
+    
     
     # Find and write clean street names to XML file, save updated XML file
     print('\nCreating new output.osm file with cleaned street types...')
     cleanSt.writeClean(clean_streets_dict)
-    clean_unexpected_streets = cleanSt.audit(xml_cleaned_file)
-    print('There are ' + str(len(unexpected_streets.values())) + ' unique unexpected streets.')
+    clean_audit_results = cleanSt.audit(xml_sample_file)
+    clean_unexpected_streets = clean_audit_results[0]
+    clean_unexpected_zips = clean_audit_results[1]
+    
+    print('There are ' + str(len(clean_unexpected_streets.values())) + ' unique unexpected streets.')
     print('New audit after street names have been replaced with clean street'
           + 'names: ')
     pprint.pprint(clean_unexpected_streets)
+    
     if sample_size != 1:
         print('\nDeleting XML sample file...')
         os.remove(xml_sample_file)
