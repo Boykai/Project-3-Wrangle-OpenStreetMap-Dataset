@@ -640,14 +640,10 @@ class JsonFile(object):
                             except:
                                 node['address'] = {}
                                 node['address'][key] = child.attrib['v']
-                    # Set already clean 'addr:' attrib
+                    # Set already clean attrib
                     else:
-                        try:
-                            node['address'][child.attrib['k']] = child.attrib['v']
-                        except:
-                            node['address'] = {}
-                            node['address'][child.attrib['k']] = child.attrib['v']
-                            
+                        node[child.attrib['k']] = child.attrib['v']
+                      
             return node
         else:
             return None
@@ -812,10 +808,10 @@ if __name__ == '__main__':
     print('\nNumber of users appearing only once (having 1 post): ')
     unique_user_count_pipeline =[{'$group':
                                      {'_id':'$created.user', 
-                                     'count':{'$sum':1}}}, 
+                                      'count':{'$sum':1}}}, 
                                 {'$group':
                                     {'_id':'$count', 
-                                    'num_users':{'$sum':1}}}, 
+                                     'num_users':{'$sum':1}}}, 
                                 {'$sort':
                                     {'_id':1}}, 
                                 {'$limit':1}]                                    
@@ -829,7 +825,7 @@ if __name__ == '__main__':
                                      {'amenity':{'$exists':1}}}, 
                                  {'$group':
                                      {'_id':'$amenity', 
-                                     'count':{'$sum':1}}}, 
+                                      'count':{'$sum':1}}}, 
                                 {'$sort':
                                      {'count':1}}, 
                                 {"$limit":10}]
@@ -840,10 +836,10 @@ if __name__ == '__main__':
     print('\nHighest population religion: ')
     most_pop_religion_pipeline = [{'$match':
                                       {'amenity':{'$exists':1}, 
-                                      'amenity':'place_of_worship'}}, 
+                                       'amenity':'place_of_worship'}}, 
                                   {'$group':
                                       {'_id':'$religion', 
-                                      'count':{'$sum':1}}}, 
+                                       'count':{'$sum':1}}}, 
                                   {'$sort':
                                       {'count':1}}, 
                                   {'$limit':1}]
@@ -854,7 +850,7 @@ if __name__ == '__main__':
     print('\nMost popular cuisines: ')
     most_pop_cuisine_pipeline = [{'$match':
                                      {'amenity':{'$exists':1}, 
-                                     'amenity':'restaurant'}}, 
+                                      'amenity':'restaurant'}}, 
                                  {'$group':
                                      {'_id':'$cuisine', 
                                      'count':{'$sum':1}}}, 
