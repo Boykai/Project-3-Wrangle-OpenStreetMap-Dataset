@@ -56,19 +56,19 @@ This section contains basic statistics about the dataset and the MongoDB queries
                                                 
 > db.brooklyn.find().count()                                                
 
-> 42515662
+> 49584653
 
 #### Number of ways
                                                 
 > db.brooklyn.find({'type' :'way'}).count()
 
-> 6650816
+> 7635808
 
 #### Number of nodes
                                                 
 > db.brooklyn.find({'type' :'node'}).count()
 
-> 38922800
+> 45006516
 
 #### Number of unique users
                                                 
@@ -97,7 +97,7 @@ This section contains basic statistics about the dataset and the MongoDB queries
                          {'$sort':{'_id':1}}, 
                          {'$limit':1}])
 
-> {u'num_users': 65, u'_id': 13}
+> {u'num_users': 65, u'_id': 15}
 
 #### Top 10 appearing amenities
 
@@ -108,7 +108,8 @@ This section contains basic statistics about the dataset and the MongoDB queries
                             'count':{'$sum':1}}}, 
                        {'$sort':{'count':1}}, 
                        {"$limit":10}])
->
+                       
+> {u'count': 1, u'_id': u'car_service'}, {u'count': 1, u'_id': u'car_parking'}, {u'count': 1, u'_id': u'music_venue'}, {u'count': 1, u'_id': u'social_facility'}, {u'count': 1, u'_id': u'funeral_directors'}, {u'count': 1, u'_id': u'Green_Market'}, {u'count': 1, u'_id': u'stock_exchange'}, {u'count': 1, u'_id': u'artwork'}, {u'count': 1, u'_id': u'nail_salon'}, {u'count': 1, u'_id': u'crematorium'}
 
 #### Highest population religion
 
@@ -121,7 +122,7 @@ This section contains basic statistics about the dataset and the MongoDB queries
                          {'$sort':{'count':1}}, 
                          {'$limit':1}])
 
->
+> {u'count': 1, u'_id': u'unitarian_universalist'}
 
 #### Most popular cuisines
 
@@ -134,7 +135,7 @@ This section contains basic statistics about the dataset and the MongoDB queries
                          {'$sort':{'count':1}}, 
                          {'$limit':2}])
                          
->
+> {u'count': 1, u'_id': u'Po_Boys'}, {u'count': 1, u'_id': u'southern,_diner'}
 
 ## Conclusion
 The Open Street Map Brooklyn XML file had many errors for just the street types and the zip codes alone. The errors or inconsistences found are not that surprising given the size and scope of Brooklyn and the OSM file. The Brooklyn OSM file has over, 42 million documents, 6 million streets, and 38 million locations within the XML file. Given the vast size of the dataset, the dataset was relatively clean but, only the street types and zip codes were wrangled and cleaned in this analysis. The dirtiness of the Brooklyn OSM XML dataset found in this analysis is just the tip of the iceberg if a 100% cleaned dataset is desired.
