@@ -137,6 +137,21 @@ This section contains basic statistics about the dataset and the MongoDB queries
                          
 > {u'count': 1, u'_id': u'Po_Boys'}, {u'count': 1, u'_id': u'southern,_diner'}
 
+## Suggestive Improvement Implenmentation
+One idea for improving the OSM dataset for different areas would be to have two versions of the dataset, production and staging. The production dataset would be unwrangled and raw, like the original one used in this dataset. The staging verion would run data wrangling such as what was implimented in this project and change various unexpected/unacceptable values to 'NaN'. Then the community could focus on updating the missing 'NaN' values with the correct values and merging the database into the production dataset.
+
+#### Count of Streets with 'NaN' Value After Wrangling
+
+>
+
+>
+
+#### Number of Addresses with 'NaN; Value for Zip Code Value After Wrangling
+
+>
+
+>
+
 ## Conclusion
 The Open Street Map Brooklyn XML file had many errors for just the street types and the zip codes alone. The errors or inconsistences found are not that surprising given the size and scope of Brooklyn and the OSM file. The Brooklyn OSM file has over, 42 million documents, 6 million streets, and 38 million locations within the XML file. Given the vast size of the dataset, the dataset was relatively clean but, only the street types and zip codes were wrangled and cleaned in this analysis. The dirtiness of the Brooklyn OSM XML dataset found in this analysis is just the tip of the iceberg if a 100% cleaned dataset is desired.
 
