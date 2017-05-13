@@ -759,7 +759,7 @@ if __name__ == '__main__':
     
     if sample_size != 1:
         print('\nDeleting XML sample file...')
-        os.remove(xml_sample_file)
+        #os.remove(xml_sample_file)
     
     # Initialize and create JSON file from cleaned XML output.osm file
     print('\nCreating new JSON file from cleaned XML file...')
@@ -845,7 +845,7 @@ if __name__ == '__main__':
                                   {'$limit':1}]
     print('db.brooklyn.aggregate(' + str(most_pop_religion_pipeline) + ')')
     most_pop_religion = mongoAggregate(db.brooklyn.aggregate(most_pop_religion_pipeline))
-    print(str(most_pop_religion))
+    print(str(most_pop_religion[0]))
                                              
     print('\nMost popular cuisines: ')
     most_pop_cuisine_pipeline = [{'$match':
@@ -859,4 +859,16 @@ if __name__ == '__main__':
                                 {'$limit':2}]          
     print('db.brooklyn.aggregate(' + str(most_pop_cuisine_pipeline) + ')')
     most_pop_cuisine = mongoAggregate(db.brooklyn.aggregate(most_pop_cuisine_pipeline))
-    print(str(most_pop_cuisine))
+    print(str(most_pop_cuisine[0]))
+    
+    print('\nPostal Codes: ')
+    postal_codes_pipeline = [{'$match':
+                                 {'address.postcode':{'$exists':1},
+                                  'address.postcode':'NaN'}}, 
+                             {'$group':
+                                 {'_id':'$address.postcode', 
+                                  'count':{'$sum':1}}}, 
+                             {'$sort':{'count':1}}]
+    print('db.brooklyn.aggregate(' + str(postal_codes_pipeline) + ')')                             
+    postal_codes = mongoAggregate(db.brooklyn.aggregate(postal_codes_pipeline))
+    print(str(postal_codes[0]))
